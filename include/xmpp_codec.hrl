@@ -303,6 +303,9 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(retract, {}).
+-type retract() :: #retract{}.
+
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -318,6 +321,9 @@
 
 -record(db_feature, {errors = false :: boolean()}).
 -type db_feature() :: #db_feature{}.
+
+-record(mix_roster_annotate, {}).
+-type mix_roster_annotate() :: #mix_roster_annotate{}.
 
 -record(x_conference, {jid :: jid:jid(),
                        password = <<>> :: binary(),
@@ -416,6 +422,13 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
+-record(moderated, {by :: undefined | jid:jid(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderated() :: #moderated{}.
+
+-record(bot, {name = <<>> :: binary()}).
+-type bot() :: #bot{}.
+
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
 
@@ -466,6 +479,12 @@
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
 -type x509_revoke() :: #x509_revoke{}.
+
+-record(moderate, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderate() :: #moderate{}.
+
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
 
 -record(sasl_auth, {mechanism = <<>> :: binary(),
                     text = <<>> :: binary()}).
@@ -519,6 +538,10 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
+-record(apply_to, {id = <<>> :: binary(),
+                   sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type apply_to() :: #apply_to{}.
+
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
                       type = <<>> :: binary(),
@@ -543,6 +566,9 @@
 -record(x509_register, {}).
 -type x509_register() :: #x509_register{}.
 
+-record(shim, {headers = [] :: [{binary(),binary()}]}).
+-type shim() :: #shim{}.
+
 -record(muc_item, {actor :: 'undefined' | #muc_actor{},
                    continue :: 'undefined' | binary(),
                    reason = <<>> :: binary(),
@@ -554,9 +580,6 @@
 
 -record(muc_admin, {items = [] :: [#muc_item{}]}).
 -type muc_admin() :: #muc_admin{}.
-
--record(shim, {headers = [] :: [{binary(),binary()}]}).
--type shim() :: #shim{}.
 
 -record(caps, {node = <<>> :: binary(),
                version = <<>> :: binary(),
@@ -594,9 +617,6 @@
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
 
--record(sasl_abort, {}).
--type sasl_abort() :: #sasl_abort{}.
-
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
 
@@ -607,6 +627,10 @@
                       x400 = false :: boolean(),
                       userid :: 'undefined' | binary()}).
 -type vcard_email() :: #vcard_email{}.
+
+-record(retracted, {stamp :: undefined | erlang:timestamp(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type retracted() :: #retracted{}.
 
 -record(db_result, {from = <<>> :: binary(),
                     to = <<>> :: binary(),
@@ -630,11 +654,6 @@
 -record(muc_hats, {hats = [] :: [#muc_hat{}]}).
 -type muc_hats() :: #muc_hats{}.
 
--record(upload_slot, {get :: 'undefined' | binary(),
-                      put :: 'undefined' | binary(),
-                      xmlns = <<>> :: binary()}).
--type upload_slot() :: #upload_slot{}.
-
 -record(vcard_geo, {lat :: 'undefined' | binary(),
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
@@ -645,13 +664,6 @@
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
-
--record(xevent, {offline = false :: boolean(),
-                 delivered = false :: boolean(),
-                 displayed = false :: boolean(),
-                 composing = false :: boolean(),
-                 id :: 'undefined' | binary()}).
--type xevent() :: #xevent{}.
 
 -record(mix, {submission_id = <<>> :: binary(),
               jid :: undefined | jid:jid(),
@@ -686,10 +698,20 @@
 -record(block_list, {items = [] :: [#block_item{}]}).
 -type block_list() :: #block_list{}.
 
--record(version, {name :: 'undefined' | binary(),
-                  ver :: 'undefined' | binary(),
-                  os :: 'undefined' | binary()}).
--type version() :: #version{}.
+-record(upload_slot, {get :: 'undefined' | binary(),
+                      put :: 'undefined' | binary(),
+                      xmlns = <<>> :: binary()}).
+-type upload_slot() :: #upload_slot{}.
+
+-record(xevent, {offline = false :: boolean(),
+                 delivered = false :: boolean(),
+                 displayed = false :: boolean(),
+                 composing = false :: boolean(),
+                 id :: 'undefined' | binary()}).
+-type xevent() :: #xevent{}.
+
+-record(sasl_abort, {}).
+-type sasl_abort() :: #sasl_abort{}.
 
 -record(jingle_ft_file, {date :: undefined | erlang:timestamp(),
                          desc = [] :: [#text{}],
@@ -799,6 +821,11 @@
 
 -record(carbons_disable, {}).
 -type carbons_disable() :: #carbons_disable{}.
+
+-record(version, {name :: 'undefined' | binary(),
+                  ver :: 'undefined' | binary(),
+                  os :: 'undefined' | binary()}).
+-type version() :: #version{}.
 
 -record(adhoc_actions, {execute :: 'complete' | 'next' | 'prev' | 'undefined',
                         prev = false :: boolean(),
@@ -910,7 +937,7 @@
                       xmlns = <<>> :: binary()}).
 -type mix_setnick() :: #mix_setnick{}.
 
--record(mix_roster_channel, {participant_id = <<>> :: binary()}).
+-record(mix_roster_channel, {'participant-id' = <<>> :: binary()}).
 -type mix_roster_channel() :: #mix_roster_channel{}.
 
 -record(roster_item, {jid :: jid:jid(),
@@ -923,7 +950,7 @@
 
 -record(roster_query, {items = [] :: [#roster_item{}],
                        ver :: 'undefined' | binary(),
-                       mix_annotate = false :: boolean()}).
+                       mix_annotate :: 'undefined' | #mix_roster_annotate{}}).
 -type roster_query() :: #roster_query{}.
 
 -record(xmpp_session, {optional = false :: boolean()}).
@@ -1259,6 +1286,7 @@
                         adhoc_actions() |
                         adhoc_command() |
                         adhoc_note() |
+                        apply_to() |
                         avatar_data() |
                         avatar_info() |
                         avatar_meta() |
@@ -1271,6 +1299,7 @@
                         bookmark_conference() |
                         bookmark_storage() |
                         bookmark_url() |
+                        bot() |
                         bytestreams() |
                         caps() |
                         carbons_disable() |
@@ -1353,9 +1382,12 @@
                         mix_leave() |
                         mix_participant() |
                         mix_presence() |
+                        mix_roster_annotate() |
                         mix_roster_channel() |
                         mix_setnick() |
                         mix_update_subscription() |
+                        moderate() |
+                        moderated() |
                         muc() |
                         muc_actor() |
                         muc_admin() |
@@ -1406,7 +1438,10 @@
                         receipt_response() |
                         redirect() |
                         register() |
+                        replace() |
                         report() |
+                        retract() |
+                        retracted() |
                         roster_item() |
                         roster_query() |
                         rosterver_feature() |
