@@ -566,9 +566,6 @@
 -record(x509_register, {}).
 -type x509_register() :: #x509_register{}.
 
--record(shim, {headers = [] :: [{binary(),binary()}]}).
--type shim() :: #shim{}.
-
 -record(muc_item, {actor :: 'undefined' | #muc_actor{},
                    continue :: 'undefined' | binary(),
                    reason = <<>> :: binary(),
@@ -580,6 +577,9 @@
 
 -record(muc_admin, {items = [] :: [#muc_item{}]}).
 -type muc_admin() :: #muc_admin{}.
+
+-record(shim, {headers = [] :: [{binary(),binary()}]}).
+-type shim() :: #shim{}.
 
 -record(caps, {node = <<>> :: binary(),
                version = <<>> :: binary(),
@@ -616,6 +616,9 @@
               port :: 'undefined' | non_neg_integer(),
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
+
+-record(sasl_abort, {}).
+-type sasl_abort() :: #sasl_abort{}.
 
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
@@ -654,6 +657,11 @@
 -record(muc_hats, {hats = [] :: [#muc_hat{}]}).
 -type muc_hats() :: #muc_hats{}.
 
+-record(upload_slot, {get :: 'undefined' | binary(),
+                      put :: 'undefined' | binary(),
+                      xmlns = <<>> :: binary()}).
+-type upload_slot() :: #upload_slot{}.
+
 -record(vcard_geo, {lat :: 'undefined' | binary(),
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
@@ -664,6 +672,13 @@
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
+
+-record(xevent, {offline = false :: boolean(),
+                 delivered = false :: boolean(),
+                 displayed = false :: boolean(),
+                 composing = false :: boolean(),
+                 id :: 'undefined' | binary()}).
+-type xevent() :: #xevent{}.
 
 -record(mix, {submission_id = <<>> :: binary(),
               jid :: undefined | jid:jid(),
@@ -698,20 +713,10 @@
 -record(block_list, {items = [] :: [#block_item{}]}).
 -type block_list() :: #block_list{}.
 
--record(upload_slot, {get :: 'undefined' | binary(),
-                      put :: 'undefined' | binary(),
-                      xmlns = <<>> :: binary()}).
--type upload_slot() :: #upload_slot{}.
-
--record(xevent, {offline = false :: boolean(),
-                 delivered = false :: boolean(),
-                 displayed = false :: boolean(),
-                 composing = false :: boolean(),
-                 id :: 'undefined' | binary()}).
--type xevent() :: #xevent{}.
-
--record(sasl_abort, {}).
--type sasl_abort() :: #sasl_abort{}.
+-record(version, {name :: 'undefined' | binary(),
+                  ver :: 'undefined' | binary(),
+                  os :: 'undefined' | binary()}).
+-type version() :: #version{}.
 
 -record(jingle_ft_file, {date :: undefined | erlang:timestamp(),
                          desc = [] :: [#text{}],
@@ -821,11 +826,6 @@
 
 -record(carbons_disable, {}).
 -type carbons_disable() :: #carbons_disable{}.
-
--record(version, {name :: 'undefined' | binary(),
-                  ver :: 'undefined' | binary(),
-                  os :: 'undefined' | binary()}).
--type version() :: #version{}.
 
 -record(adhoc_actions, {execute :: 'complete' | 'next' | 'prev' | 'undefined',
                         prev = false :: boolean(),
@@ -937,7 +937,7 @@
                       xmlns = <<>> :: binary()}).
 -type mix_setnick() :: #mix_setnick{}.
 
--record(mix_roster_channel, {'participant-id' = <<>> :: binary()}).
+-record(mix_roster_channel, {participant_id = <<>> :: binary()}).
 -type mix_roster_channel() :: #mix_roster_channel{}.
 
 -record(roster_item, {jid :: jid:jid(),
@@ -950,7 +950,7 @@
 
 -record(roster_query, {items = [] :: [#roster_item{}],
                        ver :: 'undefined' | binary(),
-                       mix_annotate :: 'undefined' | #mix_roster_annotate{}}).
+                       mix_annotate = false :: boolean()}).
 -type roster_query() :: #roster_query{}.
 
 -record(xmpp_session, {optional = false :: boolean()}).
