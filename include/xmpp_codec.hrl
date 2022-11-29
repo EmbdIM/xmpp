@@ -426,7 +426,7 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type moderated() :: #moderated{}.
 
--record(bot, {name = <<>> :: binary()}).
+-record(bot, {type = <<"system">> :: binary()}).
 -type bot() :: #bot{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).

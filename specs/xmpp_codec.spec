@@ -6,9 +6,9 @@
 -xml(bot,
 #elem{name = <<"bot">>,
 	xmlns = <<"urn:deribit:system">>,
-	module = 'dribit_codec',
-	result = {bot, '$name'},
-	attrs = [#attr{name = <<"name">>}]}).
+	module = 'deribit_codec',
+	result = {bot, '$type'},
+	attrs = [#attr{name = <<"type">>}]}).
 
 -xml(retract,
 	#elem{name = <<"retract">>,
