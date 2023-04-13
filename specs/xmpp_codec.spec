@@ -22,9 +22,18 @@
 		xmlns = <<"urn:deribit:system">>,
 		module = 'deribit_codec',
 		result = {entity, '$type', '$offset', '$length'},
-		attrs = [#attr{name = <<"type">>},
-			#attr{name = <<"offset">>},
-			#attr{name = <<"length">>}]}).
+		attrs = [#attr{name = <<"type">>,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[bold, italic, underline, strikethrough, code, pre, text_link, mention, hashtag]]}},
+				#attr{name = <<"offset">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}},
+				#attr{name = <<"length">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}}]}).
 
 
 -xml(retract,

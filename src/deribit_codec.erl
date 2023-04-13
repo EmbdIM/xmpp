@@ -45,7 +45,15 @@ dec_enum(Val, Enums) ->
         true -> AtomVal
     end.
 
+dec_int(Val, Min, Max) ->
+    case erlang:binary_to_integer(Val) of
+        Int when Int =< Max, Min == infinity -> Int;
+        Int when Int =< Max, Int >= Min -> Int
+    end.
+
 enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
+
+enc_int(Int) -> erlang:integer_to_binary(Int).
 
 decode_entity(__TopXMLNS, __Opts,
               {xmlel, <<"entity">>, _attrs, _els}) ->
@@ -106,28 +114,63 @@ encode_entity({entity, Type, Offset, Length},
                                                                                                                     __TopXMLNS)))),
     {xmlel, <<"entity">>, _attrs, _els}.
 
-decode_entity_attr_type(__TopXMLNS, undefined) -> <<>>;
-decode_entity_attr_type(__TopXMLNS, _val) -> _val.
+decode_entity_attr_type(__TopXMLNS, undefined) ->
+    undefined;
+decode_entity_attr_type(__TopXMLNS, _val) ->
+    case catch dec_enum(_val,
+                        [bold,
+                         italic,
+                         underline,
+                         strikethrough,
+                         code,
+                         pre,
+                         text_link,
+                         mention,
+                         hashtag])
+        of
+        {'EXIT', _} ->
+            erlang:error({xmpp_codec,
+                          {bad_attr_value,
+                           <<"type">>,
+                           <<"entity">>,
+                           __TopXMLNS}});
+        _res -> _res
+    end.
 
-encode_entity_attr_type(<<>>, _acc) -> _acc;
 encode_entity_attr_type(_val, _acc) ->
-    [{<<"type">>, _val} | _acc].
+    [{<<"type">>, enc_enum(_val)} | _acc].
 
-decode_entity_attr_offset(__TopXMLNS, undefined) ->
-    <<>>;
-decode_entity_attr_offset(__TopXMLNS, _val) -> _val.
+decode_entity_attr_offset(__TopXMLNS, undefined) -> 0;
+decode_entity_attr_offset(__TopXMLNS, _val) ->
+    case catch dec_int(_val, 0, infinity) of
+        {'EXIT', _} ->
+            erlang:error({xmpp_codec,
+                          {bad_attr_value,
+                           <<"offset">>,
+                           <<"entity">>,
+                           __TopXMLNS}});
+        _res -> _res
+    end.
 
-encode_entity_attr_offset(<<>>, _acc) -> _acc;
+encode_entity_attr_offset(0, _acc) -> _acc;
 encode_entity_attr_offset(_val, _acc) ->
-    [{<<"offset">>, _val} | _acc].
+    [{<<"offset">>, enc_int(_val)} | _acc].
 
-decode_entity_attr_length(__TopXMLNS, undefined) ->
-    <<>>;
-decode_entity_attr_length(__TopXMLNS, _val) -> _val.
+decode_entity_attr_length(__TopXMLNS, undefined) -> 0;
+decode_entity_attr_length(__TopXMLNS, _val) ->
+    case catch dec_int(_val, 0, infinity) of
+        {'EXIT', _} ->
+            erlang:error({xmpp_codec,
+                          {bad_attr_value,
+                           <<"length">>,
+                           <<"entity">>,
+                           __TopXMLNS}});
+        _res -> _res
+    end.
 
-encode_entity_attr_length(<<>>, _acc) -> _acc;
+encode_entity_attr_length(0, _acc) -> _acc;
 encode_entity_attr_length(_val, _acc) ->
-    [{<<"length">>, _val} | _acc].
+    [{<<"length">>, enc_int(_val)} | _acc].
 
 decode_bot(__TopXMLNS, __Opts,
            {xmlel, <<"bot">>, _attrs, _els}) ->
