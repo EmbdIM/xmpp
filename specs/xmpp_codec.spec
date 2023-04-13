@@ -4,11 +4,28 @@
 -type text() :: #text{}.
 
 -xml(bot,
-#elem{name = <<"bot">>,
-	xmlns = <<"urn:deribit:system">>,
-	module = 'deribit_codec',
-	result = {bot, '$type'},
-	attrs = [#attr{name = <<"type">>}]}).
+	#elem{name = <<"bot">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {bot, '$name','$type', '$entities', '$parse_mode'},
+		attrs = [#attr{name = <<"name">>},
+				 #attr{name = <<"type">>, default = system},
+				 #attr{name = <<"parse_mode">>,
+					default = none,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[none, markdown, html]]}}],
+		refs = [#ref{name = entity, label = '$entities'}]}).
+
+-xml(entity,
+	#elem{name = <<"entity">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {entity, '$type', '$offset', '$length'},
+		attrs = [#attr{name = <<"type">>},
+			#attr{name = <<"offset">>},
+			#attr{name = <<"length">>}]}).
+
 
 -xml(retract,
 	#elem{name = <<"retract">>,

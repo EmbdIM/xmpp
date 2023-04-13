@@ -1104,6 +1104,8 @@ get_mod(<<"MSG">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"PHONETIC">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"jid">>, <<"urn:xmpp:mam:0">>) -> xep0313;
 get_mod(<<"fin">>, <<"urn:xmpp:mam:2">>) -> xep0313;
+get_mod(<<"entity">>, <<"urn:deribit:system">>) ->
+    deribit_codec;
 get_mod(<<"ver">>, <<"urn:xmpp:features:rosterver">>) ->
     rfc6121;
 get_mod(<<"body">>, <<"jabber:client">>) -> rfc6120;
@@ -1768,6 +1770,7 @@ get_mod({adhoc_actions, _, _, _, _}) -> xep0050;
 get_mod({adhoc_note, _, _}) -> xep0050;
 get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
+get_mod({bot, _, _, _, _}) -> deribit_codec;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register,
@@ -1854,7 +1857,6 @@ get_mod({adhoc_command, _, _, _, _, _, _, _, _}) ->
     xep0050;
 get_mod({media, _, _, _}) -> xep0221;
 get_mod({ibb_data, _, _, _}) -> xep0047;
-get_mod({bot, _}) -> deribit_codec;
 get_mod({identity, _, _, _, _}) -> xep0030;
 get_mod({redirect, _}) -> rfc6120;
 get_mod({muc_history, _, _, _, _}) -> xep0045;
@@ -1932,6 +1934,7 @@ get_mod({x509_register}) -> xep0417;
 get_mod({roster_item, _, _, _, _, _, _}) -> rfc6121;
 get_mod({rsm_set, _, _, _, _, _, _, _}) -> xep0059;
 get_mod({avatar_meta, _, _}) -> xep0084;
+get_mod({entity, _, _, _}) -> deribit_codec;
 get_mod({retract}) -> xep0424;
 get_mod({roster_query, _, _, _}) -> rfc6121;
 get_mod({unblock, _}) -> xep0191;

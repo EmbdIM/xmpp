@@ -426,9 +426,6 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type moderated() :: #moderated{}.
 
--record(bot, {type = <<"system">> :: binary()}).
--type bot() :: #bot{}.
-
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
 
@@ -895,6 +892,17 @@
                      suffix :: 'undefined' | binary()}).
 -type vcard_name() :: #vcard_name{}.
 
+-record(entity, {type = <<>> :: binary(),
+                 offset = <<>> :: binary(),
+                 length = <<>> :: binary()}).
+-type entity() :: #entity{}.
+
+-record(bot, {name = <<>> :: binary(),
+              type = system :: 'system' | binary(),
+              entities = [] :: [#entity{}],
+              parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
+
 -record(inbox_entry, {unread :: 'undefined' | non_neg_integer(),
                       jid :: undefined | jid:jid(),
                       id = <<>> :: binary()}).
@@ -1324,6 +1332,7 @@
                         disco_info() |
                         disco_item() |
                         disco_items() |
+                        entity() |
                         expire() |
                         feature_csi() |
                         feature_register() |
