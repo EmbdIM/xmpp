@@ -5,6 +5,9 @@
 
 -compile(export_all).
 
+do_decode(<<"entities">>, <<"urn:deribit:system">>, El,
+          Opts) ->
+    decode_entities(<<"urn:deribit:system">>, Opts, El);
 do_decode(<<"entity">>, <<"urn:deribit:system">>, El,
           Opts) ->
     decode_entity(<<"urn:deribit:system">>, Opts, El);
@@ -17,27 +20,33 @@ do_decode(Name, XMLNS, _, _) ->
     erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
-    [{<<"entity">>, <<"urn:deribit:system">>},
+    [{<<"entities">>, <<"urn:deribit:system">>},
+     {<<"entity">>, <<"urn:deribit:system">>},
      {<<"bot">>, <<"urn:deribit:system">>}].
 
 do_encode({bot, _, _, _, _} = Bot, TopXMLNS) ->
     encode_bot(Bot, TopXMLNS);
 do_encode({entity, _, _, _} = Entity, TopXMLNS) ->
-    encode_entity(Entity, TopXMLNS).
+    encode_entity(Entity, TopXMLNS);
+do_encode({entities, _} = Entities, TopXMLNS) ->
+    encode_entities(Entities, TopXMLNS).
 
 do_get_name({bot, _, _, _, _}) -> <<"bot">>;
+do_get_name({entities, _}) -> <<"entities">>;
 do_get_name({entity, _, _, _}) -> <<"entity">>.
 
 do_get_ns({bot, _, _, _, _}) ->
     <<"urn:deribit:system">>;
+do_get_ns({entities, _}) -> <<"urn:deribit:system">>;
 do_get_ns({entity, _, _, _}) ->
     <<"urn:deribit:system">>.
 
 pp(bot, 4) -> [name, type, entities, parse_mode];
 pp(entity, 3) -> [type, offset, length];
+pp(entities, 1) -> [items];
 pp(_, _) -> no.
 
-records() -> [{bot, 4}, {entity, 3}].
+records() -> [{bot, 4}, {entity, 3}, {entities, 1}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -54,6 +63,57 @@ dec_int(Val, Min, Max) ->
 enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
 
 enc_int(Int) -> erlang:integer_to_binary(Int).
+
+decode_entities(__TopXMLNS, __Opts,
+                {xmlel, <<"entities">>, _attrs, _els}) ->
+    Items = decode_entities_els(__TopXMLNS,
+                                __Opts,
+                                _els,
+                                []),
+    {entities, Items}.
+
+decode_entities_els(__TopXMLNS, __Opts, [], Items) ->
+    lists:reverse(Items);
+decode_entities_els(__TopXMLNS, __Opts,
+                    [{xmlel, <<"entity">>, _attrs, _} = _el | _els],
+                    Items) ->
+    case xmpp_codec:get_attr(<<"xmlns">>,
+                             _attrs,
+                             __TopXMLNS)
+        of
+        <<"urn:deribit:system">> ->
+            decode_entities_els(__TopXMLNS,
+                                __Opts,
+                                _els,
+                                [decode_entity(<<"urn:deribit:system">>,
+                                               __Opts,
+                                               _el)
+                                 | Items]);
+        _ ->
+            decode_entities_els(__TopXMLNS, __Opts, _els, Items)
+    end;
+decode_entities_els(__TopXMLNS, __Opts, [_ | _els],
+                    Items) ->
+    decode_entities_els(__TopXMLNS, __Opts, _els, Items).
+
+encode_entities({entities, Items}, __TopXMLNS) ->
+    __NewTopXMLNS =
+        xmpp_codec:choose_top_xmlns(<<"urn:deribit:system">>,
+                                    [],
+                                    __TopXMLNS),
+    _els = lists:reverse('encode_entities_$items'(Items,
+                                                  __NewTopXMLNS,
+                                                  [])),
+    _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+                                        __TopXMLNS),
+    {xmlel, <<"entities">>, _attrs, _els}.
+
+'encode_entities_$items'([], __TopXMLNS, _acc) -> _acc;
+'encode_entities_$items'([Items | _els], __TopXMLNS,
+                         _acc) ->
+    'encode_entities_$items'(_els,
+                             __TopXMLNS,
+                             [encode_entity(Items, __TopXMLNS) | _acc]).
 
 decode_entity(__TopXMLNS, __Opts,
               {xmlel, <<"entity">>, _attrs, _els}) ->

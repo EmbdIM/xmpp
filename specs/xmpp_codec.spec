@@ -35,6 +35,12 @@
 					dec = {dec_int, [0, infinity]},
 					enc = {enc_int, []}}]}).
 
+-xml(entities,
+	#elem{name = <<"entities">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {entities, '$items'},
+		refs = [#ref{name = entity, label = '$items'}]}).
 
 -xml(retract,
 	#elem{name = <<"retract">>,

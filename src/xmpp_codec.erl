@@ -370,6 +370,8 @@ get_mod(<<"received">>, <<"urn:xmpp:carbons:2">>) ->
 get_mod(<<"x">>, <<"jabber:x:event">>) -> xep0022;
 get_mod(<<"general-error">>, <<"urn:xmpp:jingle:1">>) ->
     xep0166;
+get_mod(<<"entities">>, <<"urn:deribit:system">>) ->
+    deribit_codec;
 get_mod(<<"nick">>, <<"jabber:iq:register">>) ->
     xep0077;
 get_mod(<<"internal-server-error">>,
@@ -1846,6 +1848,7 @@ get_mod({delegation_query, _, _}) -> xep0355;
 get_mod({jingle_error, _}) -> xep0166;
 get_mod({jingle_s5b_candidate, _, _, _, _, _, _}) ->
     xep0260;
+get_mod({entities, _}) -> deribit_codec;
 get_mod({sasl_success, _}) -> rfc6120;
 get_mod({compress, _}) -> xep0138;
 get_mod({xdata_field, _, _, _, _, _, _, _, _}) ->

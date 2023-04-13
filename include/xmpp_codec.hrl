@@ -897,6 +897,9 @@
                  length = 0 :: non_neg_integer()}).
 -type entity() :: #entity{}.
 
+-record(entities, {items = [] :: [#entity{}]}).
+-type entities() :: #entities{}.
+
 -record(bot, {name = <<>> :: binary(),
               type = system :: 'system' | binary(),
               entities = [] :: [#entity{}],
@@ -1332,6 +1335,7 @@
                         disco_info() |
                         disco_item() |
                         disco_items() |
+                        entities() |
                         entity() |
                         expire() |
                         feature_csi() |
