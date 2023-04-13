@@ -303,6 +303,9 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(retract, {}).
+-type retract() :: #retract{}.
+
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -318,6 +321,9 @@
 
 -record(db_feature, {errors = false :: boolean()}).
 -type db_feature() :: #db_feature{}.
+
+-record(mix_roster_annotate, {}).
+-type mix_roster_annotate() :: #mix_roster_annotate{}.
 
 -record(x_conference, {jid :: jid:jid(),
                        password = <<>> :: binary(),
@@ -416,6 +422,13 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
+-record(moderated, {by :: undefined | jid:jid(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderated() :: #moderated{}.
+
+-record(bot, {type = <<"system">> :: binary()}).
+-type bot() :: #bot{}.
+
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
 
@@ -466,6 +479,12 @@
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
 -type x509_revoke() :: #x509_revoke{}.
+
+-record(moderate, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderate() :: #moderate{}.
+
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
 
 -record(sasl_auth, {mechanism = <<>> :: binary(),
                     text = <<>> :: binary()}).
@@ -518,6 +537,10 @@
                           subid = <<>> :: binary(),
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
+
+-record(apply_to, {id = <<>> :: binary(),
+                   sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type apply_to() :: #apply_to{}.
 
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
@@ -607,6 +630,10 @@
                       x400 = false :: boolean(),
                       userid :: 'undefined' | binary()}).
 -type vcard_email() :: #vcard_email{}.
+
+-record(retracted, {stamp :: undefined | erlang:timestamp(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type retracted() :: #retracted{}.
 
 -record(db_result, {from = <<>> :: binary(),
                     to = <<>> :: binary(),
@@ -1259,6 +1286,7 @@
                         adhoc_actions() |
                         adhoc_command() |
                         adhoc_note() |
+                        apply_to() |
                         avatar_data() |
                         avatar_info() |
                         avatar_meta() |
@@ -1271,6 +1299,7 @@
                         bookmark_conference() |
                         bookmark_storage() |
                         bookmark_url() |
+                        bot() |
                         bytestreams() |
                         caps() |
                         carbons_disable() |
@@ -1353,9 +1382,12 @@
                         mix_leave() |
                         mix_participant() |
                         mix_presence() |
+                        mix_roster_annotate() |
                         mix_roster_channel() |
                         mix_setnick() |
                         mix_update_subscription() |
+                        moderate() |
+                        moderated() |
                         muc() |
                         muc_actor() |
                         muc_admin() |
@@ -1406,7 +1438,10 @@
                         receipt_response() |
                         redirect() |
                         register() |
+                        replace() |
                         report() |
+                        retract() |
+                        retracted() |
                         roster_item() |
                         roster_query() |
                         rosterver_feature() |
