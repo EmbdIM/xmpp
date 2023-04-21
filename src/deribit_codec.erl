@@ -41,7 +41,7 @@ do_get_ns({entities, _}) -> <<"urn:deribit:system">>;
 do_get_ns({entity, _, _, _}) ->
     <<"urn:deribit:system">>.
 
-pp(bot, 4) -> [name, type, entities, parse_mode];
+pp(bot, 4) -> [nick, type, entities, parse_mode];
 pp(entity, 3) -> [type, offset, length];
 pp(entities, 1) -> [items];
 pp(_, _) -> no.
@@ -235,12 +235,12 @@ encode_entity_attr_length(_val, _acc) ->
 decode_bot(__TopXMLNS, __Opts,
            {xmlel, <<"bot">>, _attrs, _els}) ->
     Entities = decode_bot_els(__TopXMLNS, __Opts, _els, []),
-    {Name, Type, Parse_mode} = decode_bot_attrs(__TopXMLNS,
+    {Nick, Type, Parse_mode} = decode_bot_attrs(__TopXMLNS,
                                                 _attrs,
                                                 undefined,
                                                 undefined,
                                                 undefined),
-    {bot, Name, Type, Entities, Parse_mode}.
+    {bot, Nick, Type, Entities, Parse_mode}.
 
 decode_bot_els(__TopXMLNS, __Opts, [], Entities) ->
     lists:reverse(Entities);
@@ -264,7 +264,7 @@ decode_bot_els(__TopXMLNS, __Opts, [_ | _els],
     decode_bot_els(__TopXMLNS, __Opts, _els, Entities).
 
 decode_bot_attrs(__TopXMLNS,
-                 [{<<"name">>, _val} | _attrs], _Name, Type,
+                 [{<<"nick">>, _val} | _attrs], _Nick, Type,
                  Parse_mode) ->
     decode_bot_attrs(__TopXMLNS,
                      _attrs,
@@ -272,31 +272,31 @@ decode_bot_attrs(__TopXMLNS,
                      Type,
                      Parse_mode);
 decode_bot_attrs(__TopXMLNS,
-                 [{<<"type">>, _val} | _attrs], Name, _Type,
+                 [{<<"type">>, _val} | _attrs], Nick, _Type,
                  Parse_mode) ->
     decode_bot_attrs(__TopXMLNS,
                      _attrs,
-                     Name,
+                     Nick,
                      _val,
                      Parse_mode);
 decode_bot_attrs(__TopXMLNS,
-                 [{<<"parse_mode">>, _val} | _attrs], Name, Type,
+                 [{<<"parse_mode">>, _val} | _attrs], Nick, Type,
                  _Parse_mode) ->
-    decode_bot_attrs(__TopXMLNS, _attrs, Name, Type, _val);
-decode_bot_attrs(__TopXMLNS, [_ | _attrs], Name, Type,
+    decode_bot_attrs(__TopXMLNS, _attrs, Nick, Type, _val);
+decode_bot_attrs(__TopXMLNS, [_ | _attrs], Nick, Type,
                  Parse_mode) ->
     decode_bot_attrs(__TopXMLNS,
                      _attrs,
-                     Name,
+                     Nick,
                      Type,
                      Parse_mode);
-decode_bot_attrs(__TopXMLNS, [], Name, Type,
+decode_bot_attrs(__TopXMLNS, [], Nick, Type,
                  Parse_mode) ->
-    {decode_bot_attr_name(__TopXMLNS, Name),
+    {decode_bot_attr_nick(__TopXMLNS, Nick),
      decode_bot_attr_type(__TopXMLNS, Type),
      decode_bot_attr_parse_mode(__TopXMLNS, Parse_mode)}.
 
-encode_bot({bot, Name, Type, Entities, Parse_mode},
+encode_bot({bot, Nick, Type, Entities, Parse_mode},
            __TopXMLNS) ->
     __NewTopXMLNS =
         xmpp_codec:choose_top_xmlns(<<"urn:deribit:system">>,
@@ -307,7 +307,7 @@ encode_bot({bot, Name, Type, Entities, Parse_mode},
                                                 [])),
     _attrs = encode_bot_attr_parse_mode(Parse_mode,
                                         encode_bot_attr_type(Type,
-                                                             encode_bot_attr_name(Name,
+                                                             encode_bot_attr_nick(Nick,
                                                                                   xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
                                                                                                              __TopXMLNS)))),
     {xmlel, <<"bot">>, _attrs, _els}.
@@ -319,12 +319,12 @@ encode_bot({bot, Name, Type, Entities, Parse_mode},
                            __TopXMLNS,
                            [encode_entity(Entities, __TopXMLNS) | _acc]).
 
-decode_bot_attr_name(__TopXMLNS, undefined) -> <<>>;
-decode_bot_attr_name(__TopXMLNS, _val) -> _val.
+decode_bot_attr_nick(__TopXMLNS, undefined) -> <<>>;
+decode_bot_attr_nick(__TopXMLNS, _val) -> _val.
 
-encode_bot_attr_name(<<>>, _acc) -> _acc;
-encode_bot_attr_name(_val, _acc) ->
-    [{<<"name">>, _val} | _acc].
+encode_bot_attr_nick(<<>>, _acc) -> _acc;
+encode_bot_attr_nick(_val, _acc) ->
+    [{<<"nick">>, _val} | _acc].
 
 decode_bot_attr_type(__TopXMLNS, undefined) -> system;
 decode_bot_attr_type(__TopXMLNS, _val) -> _val.

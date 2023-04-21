@@ -900,7 +900,7 @@
 -record(entities, {items = [] :: [#entity{}]}).
 -type entities() :: #entities{}.
 
--record(bot, {name = <<>> :: binary(),
+-record(bot, {nick = <<>> :: binary(),
               type = system :: 'system' | binary(),
               entities = [] :: [#entity{}],
               parse_mode = none :: 'html' | 'markdown' | 'none'}).
