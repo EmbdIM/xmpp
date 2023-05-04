@@ -3,6 +3,92 @@
                data = <<>> :: binary()}).
 -type text() :: #text{}.
 
+-xml(bot,
+	#elem{name = <<"bot">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {bot, '$nick','$type', '$entities', '$parse_mode'},
+		attrs = [#attr{name = <<"nick">>},
+				 #attr{name = <<"type">>, default = system},
+				 #attr{name = <<"parse_mode">>,
+					default = none,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[none, markdown, html]]}}],
+		refs = [#ref{name = entity, label = '$entities'}]}).
+
+-xml(entity,
+	#elem{name = <<"entity">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {entity, '$type', '$offset', '$length'},
+		attrs = [#attr{name = <<"type">>,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[bold, italic, underline, strikethrough, code, pre, text_link, mention, hashtag]]}},
+				#attr{name = <<"offset">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}},
+				#attr{name = <<"length">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}}]}).
+
+-xml(entities,
+	#elem{name = <<"entities">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {entities, '$items'},
+		refs = [#ref{name = entity, label = '$items'}]}).
+
+-xml(retract,
+	#elem{name = <<"retract">>,
+		xmlns = <<"urn:xmpp:message-retract:0">>,
+		module = 'xep0424',
+		result = {retract}}).
+
+-xml(retracted,
+	#elem{name = <<"retracted">>,
+		xmlns = <<"urn:xmpp:message-moderate:0">>,
+		module = 'xep0425',
+		result = {retracted, '$stamp', '$_els'},
+		attrs = [#attr{name = <<"stamp">>,
+			dec = {dec_utc, []},
+			enc = {enc_utc, []}}]}).
+
+-xml(replace,
+#elem{name = <<"replace">>,
+	xmlns = <<"urn:xmpp:message-correct:0">>,
+	module = 'xep0424',
+	result = {replace, '$id'},
+	attrs = [#attr{name = <<"id">>}]}).
+
+-xml(apply_to,
+	#elem{name = <<"apply-to">>,
+		xmlns = <<"urn:xmpp:fasten:0">>,
+		module = 'xep0424',
+		result = {apply_to, '$id', '$_els'},
+		attrs = [#attr{name = <<"id">>}]
+	}).
+
+-xml(moderate,
+#elem{name = <<"moderate">>,
+	xmlns =  <<"urn:xmpp:message-moderate:0">>,
+	module = 'xep0425',
+	result = {moderate, '$_els'}
+}).
+
+-xml(moderated,
+#elem{name = <<"moderated">>,
+	xmlns = <<"urn:xmpp:message-moderate:0">>,
+	module = 'xep0425',
+	result = {moderated, '$by', '$_els'},
+	attrs = [#attr{name = <<"by">>,
+				dec = {jid, decode, []},
+				enc = {jid, encode, []}}]
+}).
+
 -xml(jidprep,
      #elem{name = <<"jid">>,
 	   xmlns = <<"urn:xmpp:jidprep:0">>,
