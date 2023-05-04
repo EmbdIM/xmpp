@@ -370,6 +370,9 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
+-record(fallback, {for = <<>> :: binary()}).
+-type fallback() :: #fallback{}.
+
 -record(nick, {name = <<>> :: binary()}).
 -type nick() :: #nick{}.
 
@@ -928,6 +931,10 @@
                     cred :: 'undefined' | binary()}).
 -type vcard_key() :: #vcard_key{}.
 
+-record(reply, {id = <<>> :: binary(),
+                to = <<>> :: binary()}).
+-type reply() :: #reply{}.
+
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
 -type inbox_query() :: #inbox_query{}.
 
@@ -1338,6 +1345,7 @@
                         entities() |
                         entity() |
                         expire() |
+                        fallback() |
                         feature_csi() |
                         feature_register() |
                         feature_sm() |
@@ -1452,6 +1460,7 @@
                         redirect() |
                         register() |
                         replace() |
+                        reply() |
                         report() |
                         retract() |
                         retracted() |

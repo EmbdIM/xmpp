@@ -434,6 +434,7 @@ get_mod(<<"next">>,
     xep0050;
 get_mod(<<"x509-signature">>, <<"urn:xmpp:x509:0">>) ->
     xep0417;
+get_mod(<<"reply">>, <<"urn:xmpp:reply:0">>) -> xep0461;
 get_mod(<<"subscription">>,
         <<"http://jabber.org/protocol/pubsub">>) ->
     xep0060;
@@ -1034,6 +1035,9 @@ get_mod(<<"delivered">>, <<"jabber:x:event">>) ->
     xep0022;
 get_mod(<<"x509-cert-chain">>, <<"urn:xmpp:x509:0">>) ->
     xep0417;
+get_mod(<<"fallback">>,
+        <<"urn:xmpp:feature-fallback:0">>) ->
+    xep0461;
 get_mod(<<"iq">>, <<"jabber:server">>) -> rfc6120;
 get_mod(<<"message">>, <<"jabber:client">>) -> rfc6120;
 get_mod(<<"resource">>, <<"jabber:iq:auth">>) ->
@@ -1838,6 +1842,7 @@ get_mod({search_item, _, _, _, _, _}) -> xep0055;
 get_mod({xcaptcha, _}) -> xep0158;
 get_mod({avatar_data, _}) -> xep0084;
 get_mod({hash, _, _}) -> xep0300;
+get_mod({reply, _, _}) -> xep0461;
 get_mod({vcard_key, _, _}) -> xep0054;
 get_mod({sm_r, _}) -> xep0198;
 get_mod({mix_join, _, _, _, _, _}) -> xep0369;
@@ -2013,4 +2018,5 @@ get_mod({bookmark_conference, _, _, _, _, _}) ->
 get_mod({vcard_name, _, _, _, _, _}) -> xep0054;
 get_mod({inbox_fin, _, _, _, _}) -> xep0430;
 get_mod({csi, _}) -> xep0352;
+get_mod({fallback, _}) -> xep0461;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).

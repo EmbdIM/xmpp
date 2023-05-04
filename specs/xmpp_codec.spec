@@ -3,6 +3,21 @@
                data = <<>> :: binary()}).
 -type text() :: #text{}.
 
+-xml(reply,
+	#elem{name = <<"reply">>,
+	xmlns = <<"urn:xmpp:reply:0">>,
+	module = 'xep0461',
+	result = {reply, '$id', '$to'},
+	attrs = [#attr{name = <<"id">>},
+			 #attr{name = <<"to">>}]}).
+
+-xml(fallback,
+#elem{name = <<"fallback">>,
+	xmlns = <<"urn:xmpp:feature-fallback:0">>,
+	module = 'xep0461',
+	result = {fallback, '$for'},
+	attrs = [#attr{name = <<"for">>}]}).
+
 -xml(bot,
 	#elem{name = <<"bot">>,
 		xmlns = <<"urn:deribit:system">>,
