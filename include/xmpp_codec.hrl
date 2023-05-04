@@ -370,7 +370,12 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
--record(fallback, {for = <<>> :: binary()}).
+-record(fb_body, {start = 0 :: non_neg_integer(),
+                  'end' = 0 :: non_neg_integer()}).
+-type fb_body() :: #fb_body{}.
+
+-record(fallback, {for = 'urn:xmpp:reply:0' :: 'urn:xmpp:reply:0' | binary(),
+                   body = [] :: [#fb_body{}]}).
 -type fallback() :: #fallback{}.
 
 -record(nick, {name = <<>> :: binary()}).
@@ -1346,6 +1351,7 @@
                         entity() |
                         expire() |
                         fallback() |
+                        fb_body() |
                         feature_csi() |
                         feature_register() |
                         feature_sm() |

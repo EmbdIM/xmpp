@@ -1195,6 +1195,9 @@ get_mod(<<"actor">>,
     xep0045;
 get_mod(<<"withtext">>, <<"urn:xmpp:mam:tmp">>) ->
     xep0313;
+get_mod(<<"body">>,
+        <<"urn:xmpp:feature-fallback:0">>) ->
+    xep0461;
 get_mod(<<"username">>, <<"jabber:iq:auth">>) ->
     xep0078;
 get_mod(<<"required">>,
@@ -1843,6 +1846,7 @@ get_mod({xcaptcha, _}) -> xep0158;
 get_mod({avatar_data, _}) -> xep0084;
 get_mod({hash, _, _}) -> xep0300;
 get_mod({reply, _, _}) -> xep0461;
+get_mod({fb_body, _, _}) -> xep0461;
 get_mod({vcard_key, _, _}) -> xep0054;
 get_mod({sm_r, _}) -> xep0198;
 get_mod({mix_join, _, _, _, _, _}) -> xep0369;
@@ -1865,6 +1869,7 @@ get_mod({adhoc_command, _, _, _, _, _, _, _, _}) ->
     xep0050;
 get_mod({media, _, _, _}) -> xep0221;
 get_mod({ibb_data, _, _, _}) -> xep0047;
+get_mod({fallback, _, _}) -> xep0461;
 get_mod({identity, _, _, _, _}) -> xep0030;
 get_mod({redirect, _}) -> rfc6120;
 get_mod({muc_history, _, _, _, _}) -> xep0045;
@@ -2018,5 +2023,18 @@ get_mod({bookmark_conference, _, _, _, _, _}) ->
 get_mod({vcard_name, _, _, _, _, _}) -> xep0054;
 get_mod({inbox_fin, _, _, _, _}) -> xep0430;
 get_mod({csi, _}) -> xep0352;
-get_mod({fallback, _}) -> xep0461;
+get_mod({sm_a, _, _}) -> xep0198;
+get_mod({jingle_s5b_transport, _, _, _, _, _, _, _}) ->
+    xep0260;
+get_mod({privacy_query, _, _, _}) -> xep0016;
+get_mod({block, _}) -> xep0191;
+get_mod({ps_subscription, _, _, _, _, _, _}) -> xep0060;
+get_mod({ps_error, _, _}) -> xep0060;
+get_mod({delay, _, _, _}) -> xep0203;
+get_mod({muc_actor, _, _}) -> xep0045;
+get_mod({nick, _}) -> xep0172;
+get_mod({jingle, _, _, _, _, _, _, _}) -> xep0166;
+get_mod({x509_csr, _, _}) -> xep0417;
+get_mod({services, _, _}) -> xep0215;
+get_mod({avatar_info, _, _, _, _, _, _}) -> xep0084;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).

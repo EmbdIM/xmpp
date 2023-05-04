@@ -12,11 +12,26 @@
 			 #attr{name = <<"to">>}]}).
 
 -xml(fallback,
-#elem{name = <<"fallback">>,
-	xmlns = <<"urn:xmpp:feature-fallback:0">>,
-	module = 'xep0461',
-	result = {fallback, '$for'},
-	attrs = [#attr{name = <<"for">>}]}).
+	#elem{name = <<"fallback">>,
+		xmlns = <<"urn:xmpp:feature-fallback:0">>,
+		module = 'xep0461',
+		result = {fallback, '$for', '$body'},
+		attrs = [#attr{name = <<"for">>, default = 'urn:xmpp:reply:0'}],
+		refs = [#ref{name = fb_body, label = '$body'}]}).
+
+-xml(fb_body,
+	#elem{name = <<"body">>,
+		xmlns = <<"urn:xmpp:feature-fallback:0">>,
+		module = 'xep0461',
+		result = {fb_body, '$start', '$end'},
+		attrs = [#attr{name = <<"start">>,
+						default = 0,
+						dec = {dec_int, [0, infinity]},
+						enc = {enc_int, []}},
+				 #attr{name = <<"end">>,
+						default = 0,
+						dec = {dec_int, [0, infinity]},
+						enc = {enc_int, []}}]}).
 
 -xml(bot,
 	#elem{name = <<"bot">>,
