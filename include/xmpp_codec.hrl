@@ -322,9 +322,6 @@
 -record(db_feature, {errors = false :: boolean()}).
 -type db_feature() :: #db_feature{}.
 
--record(mix_roster_annotate, {}).
--type mix_roster_annotate() :: #mix_roster_annotate{}.
-
 -record(x_conference, {jid :: jid:jid(),
                        password = <<>> :: binary(),
                        reason = <<>> :: binary(),
@@ -374,7 +371,7 @@
                   'end' = 0 :: non_neg_integer()}).
 -type fb_body() :: #fb_body{}.
 
--record(fallback, {for = 'urn:xmpp:reply:0' :: 'urn:xmpp:reply:0' | binary(),
+-record(fallback, {for = <<117,114,110,58,120,109,112,112,58,114,101,112,108,121,58,48>> :: binary(),
                    body = [] :: [#fb_body{}]}).
 -type fallback() :: #fallback{}.
 
@@ -571,6 +568,9 @@
 -record(x509_register, {}).
 -type x509_register() :: #x509_register{}.
 
+-record(shim, {headers = [] :: [{binary(),binary()}]}).
+-type shim() :: #shim{}.
+
 -record(muc_item, {actor :: 'undefined' | #muc_actor{},
                    continue :: 'undefined' | binary(),
                    reason = <<>> :: binary(),
@@ -582,9 +582,6 @@
 
 -record(muc_admin, {items = [] :: [#muc_item{}]}).
 -type muc_admin() :: #muc_admin{}.
-
--record(shim, {headers = [] :: [{binary(),binary()}]}).
--type shim() :: #shim{}.
 
 -record(caps, {node = <<>> :: binary(),
                version = <<>> :: binary(),
@@ -621,9 +618,6 @@
               port :: 'undefined' | non_neg_integer(),
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
-
--record(sasl_abort, {}).
--type sasl_abort() :: #sasl_abort{}.
 
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
@@ -662,11 +656,6 @@
 -record(muc_hats, {hats = [] :: [#muc_hat{}]}).
 -type muc_hats() :: #muc_hats{}.
 
--record(upload_slot, {get :: 'undefined' | binary(),
-                      put :: 'undefined' | binary(),
-                      xmlns = <<>> :: binary()}).
--type upload_slot() :: #upload_slot{}.
-
 -record(vcard_geo, {lat :: 'undefined' | binary(),
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
@@ -677,13 +666,6 @@
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
-
--record(xevent, {offline = false :: boolean(),
-                 delivered = false :: boolean(),
-                 displayed = false :: boolean(),
-                 composing = false :: boolean(),
-                 id :: 'undefined' | binary()}).
--type xevent() :: #xevent{}.
 
 -record(mix, {submission_id = <<>> :: binary(),
               jid :: undefined | jid:jid(),
@@ -718,10 +700,20 @@
 -record(block_list, {items = [] :: [#block_item{}]}).
 -type block_list() :: #block_list{}.
 
--record(version, {name :: 'undefined' | binary(),
-                  ver :: 'undefined' | binary(),
-                  os :: 'undefined' | binary()}).
--type version() :: #version{}.
+-record(upload_slot, {get :: 'undefined' | binary(),
+                      put :: 'undefined' | binary(),
+                      xmlns = <<>> :: binary()}).
+-type upload_slot() :: #upload_slot{}.
+
+-record(xevent, {offline = false :: boolean(),
+                 delivered = false :: boolean(),
+                 displayed = false :: boolean(),
+                 composing = false :: boolean(),
+                 id :: 'undefined' | binary()}).
+-type xevent() :: #xevent{}.
+
+-record(sasl_abort, {}).
+-type sasl_abort() :: #sasl_abort{}.
 
 -record(jingle_ft_file, {date :: undefined | erlang:timestamp(),
                          desc = [] :: [#text{}],
@@ -832,6 +824,11 @@
 -record(carbons_disable, {}).
 -type carbons_disable() :: #carbons_disable{}.
 
+-record(version, {name :: 'undefined' | binary(),
+                  ver :: 'undefined' | binary(),
+                  os :: 'undefined' | binary()}).
+-type version() :: #version{}.
+
 -record(adhoc_actions, {execute :: 'complete' | 'next' | 'prev' | 'undefined',
                         prev = false :: boolean(),
                         next = false :: boolean(),
@@ -879,20 +876,6 @@
                       rsm :: 'undefined' | #rsm_set{}}).
 -type disco_items() :: #disco_items{}.
 
--record(muc_destroy, {xmlns = <<>> :: binary(),
-                      jid :: undefined | jid:jid(),
-                      reason = <<>> :: binary(),
-                      password :: 'undefined' | binary()}).
--type muc_destroy() :: #muc_destroy{}.
-
--record(muc_user, {decline :: 'undefined' | #muc_decline{},
-                   destroy :: 'undefined' | #muc_destroy{},
-                   invites = [] :: [#muc_invite{}],
-                   items = [] :: [#muc_item{}],
-                   status_codes = [] :: [pos_integer()],
-                   password :: 'undefined' | binary()}).
--type muc_user() :: #muc_user{}.
-
 -record(vcard_name, {family :: 'undefined' | binary(),
                      given :: 'undefined' | binary(),
                      middle :: 'undefined' | binary(),
@@ -937,7 +920,7 @@
 -type vcard_key() :: #vcard_key{}.
 
 -record(reply, {id = <<>> :: binary(),
-                to = <<>> :: binary()}).
+                to :: undefined | jid:jid()}).
 -type reply() :: #reply{}.
 
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
@@ -948,6 +931,20 @@
                    lang = <<>> :: binary(),
                    name = <<>> :: binary()}).
 -type identity() :: #identity{}.
+
+-record(muc_destroy, {xmlns = <<>> :: binary(),
+                      jid :: undefined | jid:jid(),
+                      reason = <<>> :: binary(),
+                      password :: 'undefined' | binary()}).
+-type muc_destroy() :: #muc_destroy{}.
+
+-record(muc_user, {decline :: 'undefined' | #muc_decline{},
+                   destroy :: 'undefined' | #muc_destroy{},
+                   invites = [] :: [#muc_invite{}],
+                   items = [] :: [#muc_item{}],
+                   status_codes = [] :: [pos_integer()],
+                   password :: 'undefined' | binary()}).
+-type muc_user() :: #muc_user{}.
 
 -record(bookmark_conference, {name = <<>> :: binary(),
                               jid :: jid:jid(),
@@ -1409,7 +1406,6 @@
                         mix_leave() |
                         mix_participant() |
                         mix_presence() |
-                        mix_roster_annotate() |
                         mix_roster_channel() |
                         mix_setnick() |
                         mix_update_subscription() |

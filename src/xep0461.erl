@@ -184,10 +184,11 @@ encode_fallback({fallback, For, Body}, __TopXMLNS) ->
                             [encode_fb_body(Body, __TopXMLNS) | _acc]).
 
 decode_fallback_attr_for(__TopXMLNS, undefined) ->
-    'urn:xmpp:reply:0';
+    <<"urn:xmpp:reply:0">>;
 decode_fallback_attr_for(__TopXMLNS, _val) -> _val.
 
-encode_fallback_attr_for('urn:xmpp:reply:0', _acc) ->
+encode_fallback_attr_for(<<"urn:xmpp:reply:0">>,
+                         _acc) ->
     _acc;
 encode_fallback_attr_for(_val, _acc) ->
     [{<<"for">>, _val} | _acc].
@@ -231,9 +232,16 @@ encode_reply_attr_id(<<>>, _acc) -> _acc;
 encode_reply_attr_id(_val, _acc) ->
     [{<<"id">>, _val} | _acc].
 
-decode_reply_attr_to(__TopXMLNS, undefined) -> <<>>;
-decode_reply_attr_to(__TopXMLNS, _val) -> _val.
+decode_reply_attr_to(__TopXMLNS, undefined) ->
+    undefined;
+decode_reply_attr_to(__TopXMLNS, _val) ->
+    case catch jid:decode(_val) of
+        {'EXIT', _} ->
+            erlang:error({xmpp_codec,
+                          {bad_attr_value, <<"to">>, <<"reply">>, __TopXMLNS}});
+        _res -> _res
+    end.
 
-encode_reply_attr_to(<<>>, _acc) -> _acc;
+encode_reply_attr_to(undefined, _acc) -> _acc;
 encode_reply_attr_to(_val, _acc) ->
-    [{<<"to">>, _val} | _acc].
+    [{<<"to">>, jid:encode(_val)} | _acc].

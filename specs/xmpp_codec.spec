@@ -9,14 +9,16 @@
 	module = 'xep0461',
 	result = {reply, '$id', '$to'},
 	attrs = [#attr{name = <<"id">>},
-			 #attr{name = <<"to">>}]}).
+			 #attr{name = <<"to">>,
+				 dec = {jid, decode, []},
+				 enc = {jid, encode, []}}]}).
 
 -xml(fallback,
 	#elem{name = <<"fallback">>,
 		xmlns = <<"urn:xmpp:feature-fallback:0">>,
 		module = 'xep0461',
 		result = {fallback, '$for', '$body'},
-		attrs = [#attr{name = <<"for">>, default = 'urn:xmpp:reply:0'}],
+		attrs = [#attr{name = <<"for">>, default = <<"urn:xmpp:reply:0">>}],
 		refs = [#ref{name = fb_body, label = '$body'}]}).
 
 -xml(fb_body,
