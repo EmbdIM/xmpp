@@ -371,7 +371,7 @@
                   'end' = 0 :: non_neg_integer()}).
 -type fb_body() :: #fb_body{}.
 
--record(fallback, {for = <<117,114,110,58,120,109,112,112,58,114,101,112,108,121,58,48>> :: binary(),
+-record(fallback, {for = <<>> :: binary(),
                    body = [] :: [#fb_body{}]}).
 -type fallback() :: #fallback{}.
 

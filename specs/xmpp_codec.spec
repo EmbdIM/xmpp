@@ -18,7 +18,7 @@
 		xmlns = <<"urn:xmpp:feature-fallback:0">>,
 		module = 'xep0461',
 		result = {fallback, '$for', '$body'},
-		attrs = [#attr{name = <<"for">>, default = <<"urn:xmpp:reply:0">>}],
+		attrs = [#attr{name = <<"for">>}],
 		refs = [#ref{name = fb_body, label = '$body'}]}).
 
 -xml(fb_body,
