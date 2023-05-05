@@ -10,6 +10,7 @@
 	result = {reply, '$id', '$to'},
 	attrs = [#attr{name = <<"id">>},
 			 #attr{name = <<"to">>,
+				 required = true,
 				 dec = {jid, decode, []},
 				 enc = {jid, encode, []}}]}).
 
@@ -27,11 +28,11 @@
 		module = 'xep0461',
 		result = {fb_body, '$start', '$end'},
 		attrs = [#attr{name = <<"start">>,
-						default = 0,
+						required = true,
 						dec = {dec_int, [0, infinity]},
 						enc = {enc_int, []}},
 				 #attr{name = <<"end">>,
-						default = 0,
+					    required = true,
 						dec = {dec_int, [0, infinity]},
 						enc = {enc_int, []}}]}).
 

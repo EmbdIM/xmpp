@@ -367,8 +367,8 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
--record(fb_body, {start = 0 :: non_neg_integer(),
-                  'end' = 0 :: non_neg_integer()}).
+-record(fb_body, {start :: non_neg_integer(),
+                  'end' :: non_neg_integer()}).
 -type fb_body() :: #fb_body{}.
 
 -record(fallback, {for = <<>> :: binary(),
@@ -920,7 +920,7 @@
 -type vcard_key() :: #vcard_key{}.
 
 -record(reply, {id = <<>> :: binary(),
-                to :: undefined | jid:jid()}).
+                to :: jid:jid()}).
 -type reply() :: #reply{}.
 
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).

@@ -93,7 +93,9 @@ encode_fb_body({fb_body, Start, End}, __TopXMLNS) ->
                                                                                           __TopXMLNS))),
     {xmlel, <<"body">>, _attrs, _els}.
 
-decode_fb_body_attr_start(__TopXMLNS, undefined) -> 0;
+decode_fb_body_attr_start(__TopXMLNS, undefined) ->
+    erlang:error({xmpp_codec,
+                  {missing_attr, <<"start">>, <<"body">>, __TopXMLNS}});
 decode_fb_body_attr_start(__TopXMLNS, _val) ->
     case catch dec_int(_val, 0, infinity) of
         {'EXIT', _} ->
@@ -105,11 +107,12 @@ decode_fb_body_attr_start(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_fb_body_attr_start(0, _acc) -> _acc;
 encode_fb_body_attr_start(_val, _acc) ->
     [{<<"start">>, enc_int(_val)} | _acc].
 
-decode_fb_body_attr_end(__TopXMLNS, undefined) -> 0;
+decode_fb_body_attr_end(__TopXMLNS, undefined) ->
+    erlang:error({xmpp_codec,
+                  {missing_attr, <<"end">>, <<"body">>, __TopXMLNS}});
 decode_fb_body_attr_end(__TopXMLNS, _val) ->
     case catch dec_int(_val, 0, infinity) of
         {'EXIT', _} ->
@@ -118,7 +121,6 @@ decode_fb_body_attr_end(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_fb_body_attr_end(0, _acc) -> _acc;
 encode_fb_body_attr_end(_val, _acc) ->
     [{<<"end">>, enc_int(_val)} | _acc].
 
@@ -230,7 +232,8 @@ encode_reply_attr_id(_val, _acc) ->
     [{<<"id">>, _val} | _acc].
 
 decode_reply_attr_to(__TopXMLNS, undefined) ->
-    undefined;
+    erlang:error({xmpp_codec,
+                  {missing_attr, <<"to">>, <<"reply">>, __TopXMLNS}});
 decode_reply_attr_to(__TopXMLNS, _val) ->
     case catch jid:decode(_val) of
         {'EXIT', _} ->
@@ -239,6 +242,5 @@ decode_reply_attr_to(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_reply_attr_to(undefined, _acc) -> _acc;
 encode_reply_attr_to(_val, _acc) ->
     [{<<"to">>, jid:encode(_val)} | _acc].
