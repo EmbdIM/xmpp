@@ -883,7 +883,7 @@
                      suffix :: 'undefined' | binary()}).
 -type vcard_name() :: #vcard_name{}.
 
--record(entity, {type :: 'bold' | 'code' | 'hashtag' | 'italic' | 'mention' | 'pre' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
+-record(entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
                  offset = 0 :: non_neg_integer(),
                  length = 0 :: non_neg_integer()}).
 -type entity() :: #entity{}.

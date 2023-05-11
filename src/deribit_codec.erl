@@ -186,7 +186,10 @@ decode_entity_attr_type(__TopXMLNS, _val) ->
                          pre,
                          text_link,
                          mention,
-                         hashtag])
+                         hashtag,
+                         monospace,
+                         spoiler,
+                         bot_command])
         of
         {'EXIT', _} ->
             erlang:error({xmpp_codec,
