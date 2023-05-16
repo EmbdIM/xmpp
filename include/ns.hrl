@@ -210,3 +210,6 @@
 -define(NS_HATS, <<"xmpp:prosody.im/protocol/hats:1">>).
 -define(NS_MESSAGE_MODERATE, <<"urn:xmpp:message-moderate:0">>).
 -define(NS_MESSAGE_RETRACT, <<"urn:xmpp:message-retract:0">>).
+-define(NS_REPLY, <<"urn:xmpp:reply:0">>).
+-define(NS_FEATURE_FALLBACK, <<"urn:xmpp:feature-fallback:0">>).
+-define(NS_MESSAGE_ENTITY, <<"urn:xmpp:message-entity">>).
