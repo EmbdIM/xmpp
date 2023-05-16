@@ -540,10 +540,6 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
--record(apply_to, {id = <<>> :: binary(),
-                   sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type apply_to() :: #apply_to{}.
-
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
                       type = <<>> :: binary(),
@@ -1025,12 +1021,13 @@
                     ctry :: 'undefined' | binary()}).
 -type vcard_adr() :: #vcard_adr{}.
 
--record(search_item, {jid :: jid:jid(),
-                      first :: 'undefined' | binary(),
-                      last :: 'undefined' | binary(),
-                      nick :: 'undefined' | binary(),
-                      email :: 'undefined' | binary()}).
--type search_item() :: #search_item{}.
+-record(fasten_external, {name = <<>> :: binary()}).
+-type fasten_external() :: #fasten_external{}.
+
+-record(fasten_apply_to, {id = <<>> :: binary(),
+                          external :: 'undefined' | #fasten_external{},
+                          sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type fasten_apply_to() :: #fasten_apply_to{}.
 
 -record(xdata, {type :: 'cancel' | 'form' | 'result' | 'submit',
                 instructions = [] :: [binary()],
@@ -1077,15 +1074,6 @@
                         notes = [] :: [#adhoc_note{}],
                         xdata :: 'undefined' | #xdata{}}).
 -type adhoc_command() :: #adhoc_command{}.
-
--record(search, {instructions :: 'undefined' | binary(),
-                 first :: 'undefined' | binary(),
-                 last :: 'undefined' | binary(),
-                 nick :: 'undefined' | binary(),
-                 email :: 'undefined' | binary(),
-                 items = [] :: [#search_item{}],
-                 xdata :: 'undefined' | #xdata{}}).
--type search() :: #search{}.
 
 -record(mam_query, {xmlns = <<>> :: binary(),
                     id = <<>> :: binary(),
@@ -1184,6 +1172,22 @@
                     config :: 'undefined' | #xdata{},
                     items = [] :: [#muc_item{}]}).
 -type muc_owner() :: #muc_owner{}.
+
+-record(search_item, {jid :: jid:jid(),
+                      first :: 'undefined' | binary(),
+                      last :: 'undefined' | binary(),
+                      nick :: 'undefined' | binary(),
+                      email :: 'undefined' | binary()}).
+-type search_item() :: #search_item{}.
+
+-record(search, {instructions :: 'undefined' | binary(),
+                 first :: 'undefined' | binary(),
+                 last :: 'undefined' | binary(),
+                 nick :: 'undefined' | binary(),
+                 email :: 'undefined' | binary(),
+                 items = [] :: [#search_item{}],
+                 xdata :: 'undefined' | #xdata{}}).
+-type search() :: #search{}.
 
 -record(delegation, {delegated = [] :: [#delegated{}],
                      forwarded :: 'undefined' | #forwarded{}}).
@@ -1306,7 +1310,6 @@
                         adhoc_actions() |
                         adhoc_command() |
                         adhoc_note() |
-                        apply_to() |
                         avatar_data() |
                         avatar_info() |
                         avatar_meta() |
@@ -1348,6 +1351,8 @@
                         entity() |
                         expire() |
                         fallback() |
+                        fasten_apply_to() |
+                        fasten_external() |
                         fb_body() |
                         feature_csi() |
                         feature_register() |

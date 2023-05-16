@@ -97,13 +97,31 @@
 	result = {replace, '$id'},
 	attrs = [#attr{name = <<"id">>}]}).
 
--xml(apply_to,
+%%-xml(apply_to,
+%%	#elem{name = <<"apply-to">>,
+%%		xmlns = <<"urn:xmpp:fasten:0">>,
+%%		module = 'xep0424',
+%%		result = {apply_to, '$id', '$_els'},
+%%		attrs = [#attr{name = <<"id">>}]
+%%	}).
+
+-xml(fasten_apply_to,
 	#elem{name = <<"apply-to">>,
 		xmlns = <<"urn:xmpp:fasten:0">>,
-		module = 'xep0424',
-		result = {apply_to, '$id', '$_els'},
-		attrs = [#attr{name = <<"id">>}]
-	}).
+		module = 'xep0422',
+		result = {fasten_apply_to, '$id', '$external', '$_els'},
+		attrs = [#attr{name = <<"id">>,
+			required = true}],
+		refs = [#ref{name = fasten_external, min = 0, max = 1,
+			label = '$external'}]}).
+
+-xml(fasten_external,
+	#elem{name = <<"external">>,
+		xmlns = <<"urn:xmpp:fasten:0">>,
+		module = 'xep0422',
+		result = {fasten_external, '$name'},
+		attrs = [#attr{name = <<"name">>,
+			required = true}]}).
 
 -xml(moderate,
 #elem{name = <<"moderate">>,
