@@ -367,18 +367,10 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
--record(fb_body, {start :: non_neg_integer(),
-                  'end' :: non_neg_integer()}).
--type fb_body() :: #fb_body{}.
-
 -record(message_entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
                          offset = 0 :: non_neg_integer(),
                          length = 0 :: non_neg_integer()}).
 -type message_entity() :: #message_entity{}.
-
--record(fallback, {for = <<>> :: binary(),
-                   body = [] :: [#fb_body{}]}).
--type fallback() :: #fallback{}.
 
 -record(nick, {name = <<>> :: binary()}).
 -type nick() :: #nick{}.
@@ -509,6 +501,14 @@
 
 -record(feature_csi, {}).
 -type feature_csi() :: #feature_csi{}.
+
+-record(feature_fallback_body, {start :: non_neg_integer(),
+                                'end' :: non_neg_integer()}).
+-type feature_fallback_body() :: #feature_fallback_body{}.
+
+-record(feature_fallback, {for = <<>> :: binary(),
+                           body = [] :: [#feature_fallback_body{}]}).
+-type feature_fallback() :: #feature_fallback{}.
 
 -record(report, {reason :: 'abuse' | 'spam' | 'undefined',
                  text = [] :: [#text{}]}).
@@ -1352,11 +1352,11 @@
                         disco_item() |
                         disco_items() |
                         expire() |
-                        fallback() |
                         fasten_apply_to() |
                         fasten_external() |
-                        fb_body() |
                         feature_csi() |
+                        feature_fallback() |
+                        feature_fallback_body() |
                         feature_register() |
                         feature_sm() |
                         forwarded() |

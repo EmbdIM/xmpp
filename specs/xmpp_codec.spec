@@ -14,19 +14,19 @@
 				 dec = {jid, decode, []},
 				 enc = {jid, encode, []}}]}).
 
--xml(fallback,
+-xml(feature_fallback,
 	#elem{name = <<"fallback">>,
 		xmlns = <<"urn:xmpp:feature-fallback:0">>,
 		module = 'xep0461',
-		result = {fallback, '$for', '$body'},
+		result = {feature_fallback, '$for', '$body'},
 		attrs = [#attr{name = <<"for">>}],
-		refs = [#ref{name = fb_body, label = '$body'}]}).
+		refs = [#ref{name = feature_fallback_body, label = '$body'}]}).
 
--xml(fb_body,
+-xml(feature_fallback_body,
 	#elem{name = <<"body">>,
 		xmlns = <<"urn:xmpp:feature-fallback:0">>,
 		module = 'xep0461',
-		result = {fb_body, '$start', '$end'},
+		result = {feature_fallback_body, '$start', '$end'},
 		attrs = [#attr{name = <<"start">>,
 						required = true,
 						dec = {dec_int, [0, infinity]},
