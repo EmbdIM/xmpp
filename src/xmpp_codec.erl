@@ -275,11 +275,7 @@ get_mod(<<"setup-failed">>,
 get_mod(<<"security-required">>,
         <<"urn:xmpp:jingle:errors:1">>) ->
     xep0166;
-get_mod(<<"url">>, <<"jabber:iq:register">>) -> xep0077;
-get_mod(<<"GIVEN">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"TYPE">>, <<"vcard-temp">>) -> xep0054;
-get_mod(<<"subscribe">>, <<"urn:xmpp:mix:core:0">>) ->
-    xep0369;
 get_mod(<<"query">>,
         <<"http://jabber.org/protocol/disco#items">>) ->
     xep0030;
@@ -308,6 +304,9 @@ get_mod(<<"slot">>, <<"urn:xmpp:http:upload">>) ->
 get_mod(<<"data">>,
         <<"http://jabber.org/protocol/ibb">>) ->
     xep0047;
+get_mod(<<"retracted">>,
+        <<"urn:xmpp:message-retract:0">>) ->
+    xep0424;
 get_mod(<<"query">>, <<"jabber:iq:roster">>) -> rfc6121;
 get_mod(<<"digest">>, <<"jabber:iq:auth">>) -> xep0078;
 get_mod(<<"NUMBER">>, <<"vcard-temp">>) -> xep0054;
@@ -789,9 +788,6 @@ get_mod(<<"password">>,
     xep0045;
 get_mod(<<"services">>, <<"urn:xmpp:extdisco:2">>) ->
     xep0215;
-get_mod(<<"retracted">>,
-        <<"urn:xmpp:message-moderate:0">>) ->
-    xep0425;
 get_mod(<<"method">>,
         <<"http://jabber.org/features/compress">>) ->
     xep0138;
@@ -1629,6 +1625,9 @@ get_mod(<<"x">>,
     xep0045;
 get_mod(<<"join">>, <<"urn:xmpp:mix:core:1">>) ->
     xep0369;
+get_mod(<<"reason">>,
+        <<"urn:xmpp:message-moderate:0">>) ->
+    xep0425;
 get_mod(<<"failure">>,
         <<"http://jabber.org/protocol/compress">>) ->
     xep0138;
@@ -1665,13 +1664,16 @@ get_mod(<<"query">>,
     xep0045;
 get_mod(<<"thumbnail">>, <<"urn:xmpp:thumbs:1">>) ->
     xep0264;
+get_mod(<<"url">>, <<"jabber:iq:register">>) -> xep0077;
+get_mod(<<"GIVEN">>, <<"vcard-temp">>) -> xep0054;
+get_mod(<<"subscribe">>, <<"urn:xmpp:mix:core:0">>) ->
+    xep0369;
 get_mod(Name, XMLNS) ->
     xmpp_codec_external:lookup(Name, XMLNS).
 
 get_mod({rosterver_feature}) -> rfc6121;
 get_mod({legacy_auth_feature}) -> xep0078;
 get_mod({carbons_disable}) -> xep0280;
-get_mod({moderated, _, _}) -> xep0425;
 get_mod({last, _, _}) -> xep0012;
 get_mod({compression, _}) -> xep0138;
 get_mod({mam_prefs, _, _, _, _}) -> xep0313;
@@ -1735,6 +1737,7 @@ get_mod({x_conference, _, _, _, _, _}) -> xep0249;
 get_mod({inbox_query, _}) -> xep0430;
 get_mod({disco_info, _, _, _, _}) -> xep0030;
 get_mod({oob_x, _, _, _}) -> xep0066;
+get_mod({message_retract}) -> xep0424;
 get_mod({vcard_label, _, _, _, _, _, _, _, _}) ->
     xep0054;
 get_mod({x509_challenge_failed}) -> xep0417;
@@ -1744,7 +1747,6 @@ get_mod({muc, _, _}) -> xep0045;
 get_mod({carbons_enable}) -> xep0280;
 get_mod({carbons_private}) -> xep0280;
 get_mod({mix_roster_channel, _}) -> xep0405;
-get_mod({retracted, _, _}) -> xep0425;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({report, _, _}) -> xep0377;
 get_mod({message_thread, _, _}) -> rfc6120;
@@ -1768,6 +1770,7 @@ get_mod({adhoc_note, _, _}) -> xep0050;
 get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
 get_mod({bot, _, _, _, _}) -> deribit_codec;
+get_mod({message_retracted, _, _, _, _}) -> xep0424;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register,
@@ -1870,7 +1873,6 @@ get_mod({mark_acknowledged, _}) -> xep0333;
 get_mod({jingle_ft_file, _, _, _, _, _, _, _, _}) ->
     xep0234;
 get_mod({replace, _}) -> xep0424;
-get_mod({moderate, _}) -> xep0425;
 get_mod({bookmark_url, _, _}) -> xep0048;
 get_mod({gone, _}) -> rfc6120;
 get_mod({sasl_response, _}) -> rfc6120;
@@ -1937,7 +1939,6 @@ get_mod({roster_item, _, _, _, _, _, _}) -> rfc6121;
 get_mod({rsm_set, _, _, _, _, _, _, _}) -> xep0059;
 get_mod({avatar_meta, _, _}) -> xep0084;
 get_mod({entity, _, _, _}) -> deribit_codec;
-get_mod({retract}) -> xep0424;
 get_mod({roster_query, _, _, _}) -> rfc6121;
 get_mod({unblock, _}) -> xep0191;
 get_mod({stat_error, _, _}) -> xep0039;
@@ -1955,6 +1956,7 @@ get_mod({bob_data, _, _, _, _}) -> xep0231;
 get_mod({markable}) -> xep0333;
 get_mod({bind, _, _}) -> rfc6120;
 get_mod({rsm_first, _, _}) -> xep0059;
+get_mod({message_moderate, _, _}) -> xep0425;
 get_mod({caps, _, _, _, _}) -> xep0115;
 get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
 get_mod({ps_options, _, _, _, _}) -> xep0060;
@@ -1964,6 +1966,7 @@ get_mod({mix_create, _, _}) -> xep0369;
 get_mod({search, _, _, _, _, _, _, _}) -> xep0055;
 get_mod({expire, _, _}) -> xep0023;
 get_mod({privilege, _, _}) -> xep0356;
+get_mod({message_moderated, _, _, _, _}) -> xep0425;
 get_mod({avatar_pointer, _, _, _, _, _, _}) -> xep0084;
 get_mod({muc_invite, _, _, _, _}) -> xep0045;
 get_mod({mix_client_join, _, _, _}) -> xep0405;

@@ -150,6 +150,9 @@
 -record(x509_challenge_failed, {}).
 -type x509_challenge_failed() :: #x509_challenge_failed{}.
 
+-record(message_retract, {}).
+-type message_retract() :: #message_retract{}.
+
 -record(mark_displayed, {id = <<>> :: binary()}).
 -type mark_displayed() :: #mark_displayed{}.
 
@@ -303,9 +306,6 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
--record(retract, {}).
--type retract() :: #retract{}.
-
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -427,9 +427,11 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
--record(moderated, {by :: undefined | jid:jid(),
-                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type moderated() :: #moderated{}.
+-record(message_retracted, {by = <<>> :: binary(),
+                            from = <<>> :: binary(),
+                            stamp :: erlang:timestamp(),
+                            sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type message_retracted() :: #message_retracted{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -481,9 +483,6 @@
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
 -type x509_revoke() :: #x509_revoke{}.
-
--record(moderate, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type moderate() :: #moderate{}.
 
 -record(replace, {id = <<>> :: binary()}).
 -type replace() :: #replace{}.
@@ -539,6 +538,10 @@
                           subid = <<>> :: binary(),
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
+
+-record(message_moderate, {reason :: 'undefined' | binary(),
+                           retract :: 'undefined' | #message_retract{}}).
+-type message_moderate() :: #message_moderate{}.
 
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
@@ -626,9 +629,11 @@
                       userid :: 'undefined' | binary()}).
 -type vcard_email() :: #vcard_email{}.
 
--record(retracted, {stamp :: undefined | erlang:timestamp(),
-                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type retracted() :: #retracted{}.
+-record(message_moderated, {by = <<>> :: binary(),
+                            reason :: 'undefined' | binary(),
+                            retract :: 'undefined' | #message_retract{},
+                            sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type message_moderated() :: #message_moderated{}.
 
 -record(db_result, {from = <<>> :: binary(),
                     to = <<>> :: binary(),
@@ -1217,11 +1222,6 @@
                    xmlns = <<>> :: binary()}).
 -type mix_join() :: #mix_join{}.
 
--record(mix_client_join, {channel :: undefined | jid:jid(),
-                          join :: #mix_join{},
-                          xmlns = <<>> :: binary()}).
--type mix_client_join() :: #mix_client_join{}.
-
 -record(inbox_fin, {total :: 'undefined' | non_neg_integer(),
                     unread :: 'undefined' | non_neg_integer(),
                     all_unread :: 'undefined' | non_neg_integer(),
@@ -1263,6 +1263,11 @@
 -record(stream_error, {reason :: atom() | #'see-other-host'{},
                        text = [] :: [#text{}]}).
 -type stream_error() :: #stream_error{}.
+
+-record(mix_client_join, {channel :: undefined | jid:jid(),
+                          join :: #mix_join{},
+                          xmlns = <<>> :: binary()}).
+-type mix_client_join() :: #mix_client_join{}.
 
 -record(vcard_logo, {type :: 'undefined' | binary(),
                      binval :: 'undefined' | binary(),
@@ -1401,6 +1406,10 @@
                         media() |
                         media_uri() |
                         message() |
+                        message_moderate() |
+                        message_moderated() |
+                        message_retract() |
+                        message_retracted() |
                         message_thread() |
                         mix() |
                         mix_client_join() |
@@ -1414,8 +1423,6 @@
                         mix_roster_channel() |
                         mix_setnick() |
                         mix_update_subscription() |
-                        moderate() |
-                        moderated() |
                         muc() |
                         muc_actor() |
                         muc_admin() |
@@ -1469,8 +1476,6 @@
                         replace() |
                         reply() |
                         report() |
-                        retract() |
-                        retracted() |
                         roster_item() |
                         roster_query() |
                         rosterver_feature() |
