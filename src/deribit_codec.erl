@@ -5,12 +5,16 @@
 
 -compile(export_all).
 
-do_decode(<<"entities">>, <<"urn:deribit:system">>, El,
-          Opts) ->
-    decode_entities(<<"urn:deribit:system">>, Opts, El);
-do_decode(<<"entity">>, <<"urn:deribit:system">>, El,
-          Opts) ->
-    decode_entity(<<"urn:deribit:system">>, Opts, El);
+do_decode(<<"entities">>, <<"urn:xmpp:message-entity">>,
+          El, Opts) ->
+    decode_message_entities(<<"urn:xmpp:message-entity">>,
+                            Opts,
+                            El);
+do_decode(<<"entity">>, <<"urn:xmpp:message-entity">>,
+          El, Opts) ->
+    decode_message_entity(<<"urn:xmpp:message-entity">>,
+                          Opts,
+                          El);
 do_decode(<<"bot">>, <<"urn:deribit:system">>, El,
           Opts) ->
     decode_bot(<<"urn:deribit:system">>, Opts, El);
@@ -20,33 +24,35 @@ do_decode(Name, XMLNS, _, _) ->
     erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
-    [{<<"entities">>, <<"urn:deribit:system">>},
-     {<<"entity">>, <<"urn:deribit:system">>},
+    [{<<"entities">>, <<"urn:xmpp:message-entity">>},
+     {<<"entity">>, <<"urn:xmpp:message-entity">>},
      {<<"bot">>, <<"urn:deribit:system">>}].
 
-do_encode({bot, _, _, _, _} = Bot, TopXMLNS) ->
+do_encode({bot, _, _, _} = Bot, TopXMLNS) ->
     encode_bot(Bot, TopXMLNS);
-do_encode({entity, _, _, _} = Entity, TopXMLNS) ->
-    encode_entity(Entity, TopXMLNS);
-do_encode({entities, _} = Entities, TopXMLNS) ->
-    encode_entities(Entities, TopXMLNS).
+do_encode({message_entity, _, _, _} = Entity,
+          TopXMLNS) ->
+    encode_message_entity(Entity, TopXMLNS);
+do_encode({message_entities, _} = Entities, TopXMLNS) ->
+    encode_message_entities(Entities, TopXMLNS).
 
-do_get_name({bot, _, _, _, _}) -> <<"bot">>;
-do_get_name({entities, _}) -> <<"entities">>;
-do_get_name({entity, _, _, _}) -> <<"entity">>.
+do_get_name({bot, _, _, _}) -> <<"bot">>;
+do_get_name({message_entities, _}) -> <<"entities">>;
+do_get_name({message_entity, _, _, _}) -> <<"entity">>.
 
-do_get_ns({bot, _, _, _, _}) ->
-    <<"urn:deribit:system">>;
-do_get_ns({entities, _}) -> <<"urn:deribit:system">>;
-do_get_ns({entity, _, _, _}) ->
-    <<"urn:deribit:system">>.
+do_get_ns({bot, _, _, _}) -> <<"urn:deribit:system">>;
+do_get_ns({message_entities, _}) ->
+    <<"urn:xmpp:message-entity">>;
+do_get_ns({message_entity, _, _, _}) ->
+    <<"urn:xmpp:message-entity">>.
 
-pp(bot, 4) -> [nick, type, entities, parse_mode];
-pp(entity, 3) -> [type, offset, length];
-pp(entities, 1) -> [items];
+pp(bot, 3) -> [nick, type, parse_mode];
+pp(message_entity, 3) -> [type, offset, length];
+pp(message_entities, 1) -> [items];
 pp(_, _) -> no.
 
-records() -> [{bot, 4}, {entity, 3}, {entities, 1}].
+records() ->
+    [{bot, 3}, {message_entity, 3}, {message_entities, 1}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -64,119 +70,137 @@ enc_enum(Atom) -> erlang:atom_to_binary(Atom, utf8).
 
 enc_int(Int) -> erlang:integer_to_binary(Int).
 
-decode_entities(__TopXMLNS, __Opts,
-                {xmlel, <<"entities">>, _attrs, _els}) ->
-    Items = decode_entities_els(__TopXMLNS,
-                                __Opts,
-                                _els,
-                                []),
-    {entities, Items}.
+decode_message_entities(__TopXMLNS, __Opts,
+                        {xmlel, <<"entities">>, _attrs, _els}) ->
+    Items = decode_message_entities_els(__TopXMLNS,
+                                        __Opts,
+                                        _els,
+                                        []),
+    {message_entities, Items}.
 
-decode_entities_els(__TopXMLNS, __Opts, [], Items) ->
+decode_message_entities_els(__TopXMLNS, __Opts, [],
+                            Items) ->
     lists:reverse(Items);
-decode_entities_els(__TopXMLNS, __Opts,
-                    [{xmlel, <<"entity">>, _attrs, _} = _el | _els],
-                    Items) ->
+decode_message_entities_els(__TopXMLNS, __Opts,
+                            [{xmlel, <<"entity">>, _attrs, _} = _el | _els],
+                            Items) ->
     case xmpp_codec:get_attr(<<"xmlns">>,
                              _attrs,
                              __TopXMLNS)
         of
-        <<"urn:deribit:system">> ->
-            decode_entities_els(__TopXMLNS,
+        <<"urn:xmpp:message-entity">> ->
+            decode_message_entities_els(__TopXMLNS,
+                                        __Opts,
+                                        _els,
+                                        [decode_message_entity(<<"urn:xmpp:message-entity">>,
+                                                               __Opts,
+                                                               _el)
+                                         | Items]);
+        _ ->
+            decode_message_entities_els(__TopXMLNS,
+                                        __Opts,
+                                        _els,
+                                        Items)
+    end;
+decode_message_entities_els(__TopXMLNS, __Opts,
+                            [_ | _els], Items) ->
+    decode_message_entities_els(__TopXMLNS,
                                 __Opts,
                                 _els,
-                                [decode_entity(<<"urn:deribit:system">>,
-                                               __Opts,
-                                               _el)
-                                 | Items]);
-        _ ->
-            decode_entities_els(__TopXMLNS, __Opts, _els, Items)
-    end;
-decode_entities_els(__TopXMLNS, __Opts, [_ | _els],
-                    Items) ->
-    decode_entities_els(__TopXMLNS, __Opts, _els, Items).
+                                Items).
 
-encode_entities({entities, Items}, __TopXMLNS) ->
+encode_message_entities({message_entities, Items},
+                        __TopXMLNS) ->
     __NewTopXMLNS =
-        xmpp_codec:choose_top_xmlns(<<"urn:deribit:system">>,
+        xmpp_codec:choose_top_xmlns(<<"urn:xmpp:message-entity">>,
                                     [],
                                     __TopXMLNS),
-    _els = lists:reverse('encode_entities_$items'(Items,
-                                                  __NewTopXMLNS,
-                                                  [])),
+    _els =
+        lists:reverse('encode_message_entities_$items'(Items,
+                                                       __NewTopXMLNS,
+                                                       [])),
     _attrs = xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
                                         __TopXMLNS),
     {xmlel, <<"entities">>, _attrs, _els}.
 
-'encode_entities_$items'([], __TopXMLNS, _acc) -> _acc;
-'encode_entities_$items'([Items | _els], __TopXMLNS,
-                         _acc) ->
-    'encode_entities_$items'(_els,
-                             __TopXMLNS,
-                             [encode_entity(Items, __TopXMLNS) | _acc]).
+'encode_message_entities_$items'([], __TopXMLNS,
+                                 _acc) ->
+    _acc;
+'encode_message_entities_$items'([Items | _els],
+                                 __TopXMLNS, _acc) ->
+    'encode_message_entities_$items'(_els,
+                                     __TopXMLNS,
+                                     [encode_message_entity(Items, __TopXMLNS)
+                                      | _acc]).
 
-decode_entity(__TopXMLNS, __Opts,
-              {xmlel, <<"entity">>, _attrs, _els}) ->
-    {Type, Offset, Length} = decode_entity_attrs(__TopXMLNS,
-                                                 _attrs,
-                                                 undefined,
-                                                 undefined,
-                                                 undefined),
-    {entity, Type, Offset, Length}.
+decode_message_entity(__TopXMLNS, __Opts,
+                      {xmlel, <<"entity">>, _attrs, _els}) ->
+    {Type, Offset, Length} =
+        decode_message_entity_attrs(__TopXMLNS,
+                                    _attrs,
+                                    undefined,
+                                    undefined,
+                                    undefined),
+    {message_entity, Type, Offset, Length}.
 
-decode_entity_attrs(__TopXMLNS,
-                    [{<<"type">>, _val} | _attrs], _Type, Offset, Length) ->
-    decode_entity_attrs(__TopXMLNS,
-                        _attrs,
-                        _val,
-                        Offset,
-                        Length);
-decode_entity_attrs(__TopXMLNS,
-                    [{<<"offset">>, _val} | _attrs], Type, _Offset,
-                    Length) ->
-    decode_entity_attrs(__TopXMLNS,
-                        _attrs,
-                        Type,
-                        _val,
-                        Length);
-decode_entity_attrs(__TopXMLNS,
-                    [{<<"length">>, _val} | _attrs], Type, Offset,
-                    _Length) ->
-    decode_entity_attrs(__TopXMLNS,
-                        _attrs,
-                        Type,
-                        Offset,
-                        _val);
-decode_entity_attrs(__TopXMLNS, [_ | _attrs], Type,
-                    Offset, Length) ->
-    decode_entity_attrs(__TopXMLNS,
-                        _attrs,
-                        Type,
-                        Offset,
-                        Length);
-decode_entity_attrs(__TopXMLNS, [], Type, Offset,
-                    Length) ->
-    {decode_entity_attr_type(__TopXMLNS, Type),
-     decode_entity_attr_offset(__TopXMLNS, Offset),
-     decode_entity_attr_length(__TopXMLNS, Length)}.
+decode_message_entity_attrs(__TopXMLNS,
+                            [{<<"type">>, _val} | _attrs], _Type, Offset,
+                            Length) ->
+    decode_message_entity_attrs(__TopXMLNS,
+                                _attrs,
+                                _val,
+                                Offset,
+                                Length);
+decode_message_entity_attrs(__TopXMLNS,
+                            [{<<"offset">>, _val} | _attrs], Type, _Offset,
+                            Length) ->
+    decode_message_entity_attrs(__TopXMLNS,
+                                _attrs,
+                                Type,
+                                _val,
+                                Length);
+decode_message_entity_attrs(__TopXMLNS,
+                            [{<<"length">>, _val} | _attrs], Type, Offset,
+                            _Length) ->
+    decode_message_entity_attrs(__TopXMLNS,
+                                _attrs,
+                                Type,
+                                Offset,
+                                _val);
+decode_message_entity_attrs(__TopXMLNS, [_ | _attrs],
+                            Type, Offset, Length) ->
+    decode_message_entity_attrs(__TopXMLNS,
+                                _attrs,
+                                Type,
+                                Offset,
+                                Length);
+decode_message_entity_attrs(__TopXMLNS, [], Type,
+                            Offset, Length) ->
+    {decode_message_entity_attr_type(__TopXMLNS, Type),
+     decode_message_entity_attr_offset(__TopXMLNS, Offset),
+     decode_message_entity_attr_length(__TopXMLNS, Length)}.
 
-encode_entity({entity, Type, Offset, Length},
-              __TopXMLNS) ->
+encode_message_entity({message_entity,
+                       Type,
+                       Offset,
+                       Length},
+                      __TopXMLNS) ->
     __NewTopXMLNS =
-        xmpp_codec:choose_top_xmlns(<<"urn:deribit:system">>,
+        xmpp_codec:choose_top_xmlns(<<"urn:xmpp:message-entity">>,
                                     [],
                                     __TopXMLNS),
     _els = [],
-    _attrs = encode_entity_attr_length(Length,
-                                       encode_entity_attr_offset(Offset,
-                                                                 encode_entity_attr_type(Type,
-                                                                                         xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
-                                                                                                                    __TopXMLNS)))),
+    _attrs = encode_message_entity_attr_length(Length,
+                                               encode_message_entity_attr_offset(Offset,
+                                                                                 encode_message_entity_attr_type(Type,
+                                                                                                                 xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+                                                                                                                                            __TopXMLNS)))),
     {xmlel, <<"entity">>, _attrs, _els}.
 
-decode_entity_attr_type(__TopXMLNS, undefined) ->
+decode_message_entity_attr_type(__TopXMLNS,
+                                undefined) ->
     undefined;
-decode_entity_attr_type(__TopXMLNS, _val) ->
+decode_message_entity_attr_type(__TopXMLNS, _val) ->
     case catch dec_enum(_val,
                         [bold,
                          italic,
@@ -200,11 +224,13 @@ decode_entity_attr_type(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_entity_attr_type(_val, _acc) ->
+encode_message_entity_attr_type(_val, _acc) ->
     [{<<"type">>, enc_enum(_val)} | _acc].
 
-decode_entity_attr_offset(__TopXMLNS, undefined) -> 0;
-decode_entity_attr_offset(__TopXMLNS, _val) ->
+decode_message_entity_attr_offset(__TopXMLNS,
+                                  undefined) ->
+    0;
+decode_message_entity_attr_offset(__TopXMLNS, _val) ->
     case catch dec_int(_val, 0, infinity) of
         {'EXIT', _} ->
             erlang:error({xmpp_codec,
@@ -215,12 +241,14 @@ decode_entity_attr_offset(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_entity_attr_offset(0, _acc) -> _acc;
-encode_entity_attr_offset(_val, _acc) ->
+encode_message_entity_attr_offset(0, _acc) -> _acc;
+encode_message_entity_attr_offset(_val, _acc) ->
     [{<<"offset">>, enc_int(_val)} | _acc].
 
-decode_entity_attr_length(__TopXMLNS, undefined) -> 0;
-decode_entity_attr_length(__TopXMLNS, _val) ->
+decode_message_entity_attr_length(__TopXMLNS,
+                                  undefined) ->
+    0;
+decode_message_entity_attr_length(__TopXMLNS, _val) ->
     case catch dec_int(_val, 0, infinity) of
         {'EXIT', _} ->
             erlang:error({xmpp_codec,
@@ -231,40 +259,18 @@ decode_entity_attr_length(__TopXMLNS, _val) ->
         _res -> _res
     end.
 
-encode_entity_attr_length(0, _acc) -> _acc;
-encode_entity_attr_length(_val, _acc) ->
+encode_message_entity_attr_length(0, _acc) -> _acc;
+encode_message_entity_attr_length(_val, _acc) ->
     [{<<"length">>, enc_int(_val)} | _acc].
 
 decode_bot(__TopXMLNS, __Opts,
            {xmlel, <<"bot">>, _attrs, _els}) ->
-    Entities = decode_bot_els(__TopXMLNS, __Opts, _els, []),
     {Nick, Type, Parse_mode} = decode_bot_attrs(__TopXMLNS,
                                                 _attrs,
                                                 undefined,
                                                 undefined,
                                                 undefined),
-    {bot, Nick, Type, Entities, Parse_mode}.
-
-decode_bot_els(__TopXMLNS, __Opts, [], Entities) ->
-    lists:reverse(Entities);
-decode_bot_els(__TopXMLNS, __Opts,
-               [{xmlel, <<"entity">>, _attrs, _} = _el | _els],
-               Entities) ->
-    case xmpp_codec:get_attr(<<"xmlns">>,
-                             _attrs,
-                             __TopXMLNS)
-        of
-        <<"urn:deribit:system">> ->
-            decode_bot_els(__TopXMLNS,
-                           __Opts,
-                           _els,
-                           [decode_entity(<<"urn:deribit:system">>, __Opts, _el)
-                            | Entities]);
-        _ -> decode_bot_els(__TopXMLNS, __Opts, _els, Entities)
-    end;
-decode_bot_els(__TopXMLNS, __Opts, [_ | _els],
-               Entities) ->
-    decode_bot_els(__TopXMLNS, __Opts, _els, Entities).
+    {bot, Nick, Type, Parse_mode}.
 
 decode_bot_attrs(__TopXMLNS,
                  [{<<"nick">>, _val} | _attrs], _Nick, Type,
@@ -299,28 +305,18 @@ decode_bot_attrs(__TopXMLNS, [], Nick, Type,
      decode_bot_attr_type(__TopXMLNS, Type),
      decode_bot_attr_parse_mode(__TopXMLNS, Parse_mode)}.
 
-encode_bot({bot, Nick, Type, Entities, Parse_mode},
-           __TopXMLNS) ->
+encode_bot({bot, Nick, Type, Parse_mode}, __TopXMLNS) ->
     __NewTopXMLNS =
         xmpp_codec:choose_top_xmlns(<<"urn:deribit:system">>,
                                     [],
                                     __TopXMLNS),
-    _els = lists:reverse('encode_bot_$entities'(Entities,
-                                                __NewTopXMLNS,
-                                                [])),
+    _els = [],
     _attrs = encode_bot_attr_parse_mode(Parse_mode,
                                         encode_bot_attr_type(Type,
                                                              encode_bot_attr_nick(Nick,
                                                                                   xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
                                                                                                              __TopXMLNS)))),
     {xmlel, <<"bot">>, _attrs, _els}.
-
-'encode_bot_$entities'([], __TopXMLNS, _acc) -> _acc;
-'encode_bot_$entities'([Entities | _els], __TopXMLNS,
-                       _acc) ->
-    'encode_bot_$entities'(_els,
-                           __TopXMLNS,
-                           [encode_entity(Entities, __TopXMLNS) | _acc]).
 
 decode_bot_attr_nick(__TopXMLNS, undefined) -> <<>>;
 decode_bot_attr_nick(__TopXMLNS, _val) -> _val.

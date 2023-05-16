@@ -40,21 +40,21 @@
 	#elem{name = <<"bot">>,
 		xmlns = <<"urn:deribit:system">>,
 		module = 'deribit_codec',
-		result = {bot, '$nick','$type', '$entities', '$parse_mode'},
+		result = {bot, '$nick','$type', '$parse_mode'},
 		attrs = [#attr{name = <<"nick">>},
 				 #attr{name = <<"type">>, default = system},
 				 #attr{name = <<"parse_mode">>,
 					default = none,
 					always_encode = true,
 					enc = {enc_enum, []},
-					dec = {dec_enum, [[none, markdown, html]]}}],
-		refs = [#ref{name = entity, label = '$entities'}]}).
+					dec = {dec_enum, [[none, markdown, html]]}}]
+	}).
 
--xml(entity,
+-xml(message_entity,
 	#elem{name = <<"entity">>,
-		xmlns = <<"urn:deribit:system">>,
+		xmlns = <<"urn:xmpp:message-entity">>,
 		module = 'deribit_codec',
-		result = {entity, '$type', '$offset', '$length'},
+		result = {message_entity, '$type', '$offset', '$length'},
 		attrs = [#attr{name = <<"type">>,
 					always_encode = true,
 					enc = {enc_enum, []},
@@ -68,12 +68,12 @@
 					dec = {dec_int, [0, infinity]},
 					enc = {enc_int, []}}]}).
 
--xml(entities,
+-xml(message_entities,
 	#elem{name = <<"entities">>,
-		xmlns = <<"urn:deribit:system">>,
+		xmlns = <<"urn:xmpp:message-entity">>,
 		module = 'deribit_codec',
-		result = {entities, '$items'},
-		refs = [#ref{name = entity, label = '$items'}]}).
+		result = {message_entities, '$items'},
+		refs = [#ref{name = message_entity, label = '$items'}]}).
 
 -xml(replace,
 #elem{name = <<"replace">>,

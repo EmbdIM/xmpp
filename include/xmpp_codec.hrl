@@ -371,6 +371,11 @@
                   'end' :: non_neg_integer()}).
 -type fb_body() :: #fb_body{}.
 
+-record(message_entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
+                         offset = 0 :: non_neg_integer(),
+                         length = 0 :: non_neg_integer()}).
+-type message_entity() :: #message_entity{}.
+
 -record(fallback, {for = <<>> :: binary(),
                    body = [] :: [#fb_body{}]}).
 -type fallback() :: #fallback{}.
@@ -420,6 +425,9 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
+-record(message_entities, {items = [] :: [#message_entity{}]}).
+-type message_entities() :: #message_entities{}.
+
 -record(starttls, {required = false :: boolean()}).
 -type starttls() :: #starttls{}.
 
@@ -432,6 +440,11 @@
                             stamp :: erlang:timestamp(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type message_retracted() :: #message_retracted{}.
+
+-record(bot, {nick = <<>> :: binary(),
+              type = system :: 'system' | binary(),
+              parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -883,20 +896,6 @@
                      prefix :: 'undefined' | binary(),
                      suffix :: 'undefined' | binary()}).
 -type vcard_name() :: #vcard_name{}.
-
--record(entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
-                 offset = 0 :: non_neg_integer(),
-                 length = 0 :: non_neg_integer()}).
--type entity() :: #entity{}.
-
--record(entities, {items = [] :: [#entity{}]}).
--type entities() :: #entities{}.
-
--record(bot, {nick = <<>> :: binary(),
-              type = system :: 'system' | binary(),
-              entities = [] :: [#entity{}],
-              parse_mode = none :: 'html' | 'markdown' | 'none'}).
--type bot() :: #bot{}.
 
 -record(inbox_entry, {unread :: 'undefined' | non_neg_integer(),
                       jid :: undefined | jid:jid(),
@@ -1352,8 +1351,6 @@
                         disco_info() |
                         disco_item() |
                         disco_items() |
-                        entities() |
-                        entity() |
                         expire() |
                         fallback() |
                         fasten_apply_to() |
@@ -1406,6 +1403,8 @@
                         media() |
                         media_uri() |
                         message() |
+                        message_entities() |
+                        message_entity() |
                         message_moderate() |
                         message_moderated() |
                         message_retract() |
