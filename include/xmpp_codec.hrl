@@ -147,11 +147,11 @@
                      port = 1080 :: non_neg_integer()}).
 -type streamhost() :: #streamhost{}.
 
--record(x509_challenge_failed, {}).
--type x509_challenge_failed() :: #x509_challenge_failed{}.
-
 -record(message_retract, {}).
 -type message_retract() :: #message_retract{}.
+
+-record(x509_challenge_failed, {}).
+-type x509_challenge_failed() :: #x509_challenge_failed{}.
 
 -record(mark_displayed, {id = <<>> :: binary()}).
 -type mark_displayed() :: #mark_displayed{}.
@@ -427,7 +427,7 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
--record(message_retracted, {by = <<>> :: binary(),
+-record(message_retracted, {by :: undefined | jid:jid(),
                             from = <<>> :: binary(),
                             stamp :: erlang:timestamp(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
@@ -618,6 +618,12 @@
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
 
+-record(message_moderated, {by :: undefined | jid:jid(),
+                            reason :: 'undefined' | binary(),
+                            retract :: 'undefined' | #message_retract{},
+                            sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type message_moderated() :: #message_moderated{}.
+
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
 
@@ -628,12 +634,6 @@
                       x400 = false :: boolean(),
                       userid :: 'undefined' | binary()}).
 -type vcard_email() :: #vcard_email{}.
-
--record(message_moderated, {by = <<>> :: binary(),
-                            reason :: 'undefined' | binary(),
-                            retract :: 'undefined' | #message_retract{},
-                            sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type message_moderated() :: #message_moderated{}.
 
 -record(db_result, {from = <<>> :: binary(),
                     to = <<>> :: binary(),
@@ -1000,6 +1000,14 @@
                       extval :: 'undefined' | binary()}).
 -type vcard_photo() :: #vcard_photo{}.
 
+-record(fasten_external, {name = <<>> :: binary()}).
+-type fasten_external() :: #fasten_external{}.
+
+-record(fasten_apply_to, {id = <<>> :: binary(),
+                          external :: 'undefined' | #fasten_external{},
+                          sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type fasten_apply_to() :: #fasten_apply_to{}.
+
 -record(vcard_label, {home = false :: boolean(),
                       work = false :: boolean(),
                       postal = false :: boolean(),
@@ -1025,14 +1033,6 @@
                     pcode :: 'undefined' | binary(),
                     ctry :: 'undefined' | binary()}).
 -type vcard_adr() :: #vcard_adr{}.
-
--record(fasten_external, {name = <<>> :: binary()}).
--type fasten_external() :: #fasten_external{}.
-
--record(fasten_apply_to, {id = <<>> :: binary(),
-                          external :: 'undefined' | #fasten_external{},
-                          sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type fasten_apply_to() :: #fasten_apply_to{}.
 
 -record(xdata, {type :: 'cancel' | 'form' | 'result' | 'submit',
                 instructions = [] :: [binary()],
