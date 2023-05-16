@@ -303,6 +303,9 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(retract, {}).
+-type retract() :: #retract{}.
+
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -364,6 +367,14 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
+-record(fb_body, {start :: non_neg_integer(),
+                  'end' :: non_neg_integer()}).
+-type fb_body() :: #fb_body{}.
+
+-record(fallback, {for = <<>> :: binary(),
+                   body = [] :: [#fb_body{}]}).
+-type fallback() :: #fallback{}.
+
 -record(nick, {name = <<>> :: binary()}).
 -type nick() :: #nick{}.
 
@@ -416,6 +427,10 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
+-record(moderated, {by :: undefined | jid:jid(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderated() :: #moderated{}.
+
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
 
@@ -466,6 +481,12 @@
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
 -type x509_revoke() :: #x509_revoke{}.
+
+-record(moderate, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type moderate() :: #moderate{}.
+
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
 
 -record(sasl_auth, {mechanism = <<>> :: binary(),
                     text = <<>> :: binary()}).
@@ -519,6 +540,10 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
+-record(apply_to, {id = <<>> :: binary(),
+                   sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type apply_to() :: #apply_to{}.
+
 -record(avatar_info, {bytes :: non_neg_integer(),
                       id = <<>> :: binary(),
                       type = <<>> :: binary(),
@@ -543,6 +568,9 @@
 -record(x509_register, {}).
 -type x509_register() :: #x509_register{}.
 
+-record(shim, {headers = [] :: [{binary(),binary()}]}).
+-type shim() :: #shim{}.
+
 -record(muc_item, {actor :: 'undefined' | #muc_actor{},
                    continue :: 'undefined' | binary(),
                    reason = <<>> :: binary(),
@@ -554,9 +582,6 @@
 
 -record(muc_admin, {items = [] :: [#muc_item{}]}).
 -type muc_admin() :: #muc_admin{}.
-
--record(shim, {headers = [] :: [{binary(),binary()}]}).
--type shim() :: #shim{}.
 
 -record(caps, {node = <<>> :: binary(),
                version = <<>> :: binary(),
@@ -594,9 +619,6 @@
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
 
--record(sasl_abort, {}).
--type sasl_abort() :: #sasl_abort{}.
-
 -record(receipt_request, {}).
 -type receipt_request() :: #receipt_request{}.
 
@@ -607,6 +629,10 @@
                       x400 = false :: boolean(),
                       userid :: 'undefined' | binary()}).
 -type vcard_email() :: #vcard_email{}.
+
+-record(retracted, {stamp :: undefined | erlang:timestamp(),
+                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type retracted() :: #retracted{}.
 
 -record(db_result, {from = <<>> :: binary(),
                     to = <<>> :: binary(),
@@ -630,11 +656,6 @@
 -record(muc_hats, {hats = [] :: [#muc_hat{}]}).
 -type muc_hats() :: #muc_hats{}.
 
--record(upload_slot, {get :: 'undefined' | binary(),
-                      put :: 'undefined' | binary(),
-                      xmlns = <<>> :: binary()}).
--type upload_slot() :: #upload_slot{}.
-
 -record(vcard_geo, {lat :: 'undefined' | binary(),
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
@@ -645,13 +666,6 @@
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
-
--record(xevent, {offline = false :: boolean(),
-                 delivered = false :: boolean(),
-                 displayed = false :: boolean(),
-                 composing = false :: boolean(),
-                 id :: 'undefined' | binary()}).
--type xevent() :: #xevent{}.
 
 -record(mix, {submission_id = <<>> :: binary(),
               jid :: undefined | jid:jid(),
@@ -686,10 +700,20 @@
 -record(block_list, {items = [] :: [#block_item{}]}).
 -type block_list() :: #block_list{}.
 
--record(version, {name :: 'undefined' | binary(),
-                  ver :: 'undefined' | binary(),
-                  os :: 'undefined' | binary()}).
--type version() :: #version{}.
+-record(upload_slot, {get :: 'undefined' | binary(),
+                      put :: 'undefined' | binary(),
+                      xmlns = <<>> :: binary()}).
+-type upload_slot() :: #upload_slot{}.
+
+-record(xevent, {offline = false :: boolean(),
+                 delivered = false :: boolean(),
+                 displayed = false :: boolean(),
+                 composing = false :: boolean(),
+                 id :: 'undefined' | binary()}).
+-type xevent() :: #xevent{}.
+
+-record(sasl_abort, {}).
+-type sasl_abort() :: #sasl_abort{}.
 
 -record(jingle_ft_file, {date :: undefined | erlang:timestamp(),
                          desc = [] :: [#text{}],
@@ -800,6 +824,11 @@
 -record(carbons_disable, {}).
 -type carbons_disable() :: #carbons_disable{}.
 
+-record(version, {name :: 'undefined' | binary(),
+                  ver :: 'undefined' | binary(),
+                  os :: 'undefined' | binary()}).
+-type version() :: #version{}.
+
 -record(adhoc_actions, {execute :: 'complete' | 'next' | 'prev' | 'undefined',
                         prev = false :: boolean(),
                         next = false :: boolean(),
@@ -847,26 +876,26 @@
                       rsm :: 'undefined' | #rsm_set{}}).
 -type disco_items() :: #disco_items{}.
 
--record(muc_destroy, {xmlns = <<>> :: binary(),
-                      jid :: undefined | jid:jid(),
-                      reason = <<>> :: binary(),
-                      password :: 'undefined' | binary()}).
--type muc_destroy() :: #muc_destroy{}.
-
--record(muc_user, {decline :: 'undefined' | #muc_decline{},
-                   destroy :: 'undefined' | #muc_destroy{},
-                   invites = [] :: [#muc_invite{}],
-                   items = [] :: [#muc_item{}],
-                   status_codes = [] :: [pos_integer()],
-                   password :: 'undefined' | binary()}).
--type muc_user() :: #muc_user{}.
-
 -record(vcard_name, {family :: 'undefined' | binary(),
                      given :: 'undefined' | binary(),
                      middle :: 'undefined' | binary(),
                      prefix :: 'undefined' | binary(),
                      suffix :: 'undefined' | binary()}).
 -type vcard_name() :: #vcard_name{}.
+
+-record(entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
+                 offset = 0 :: non_neg_integer(),
+                 length = 0 :: non_neg_integer()}).
+-type entity() :: #entity{}.
+
+-record(entities, {items = [] :: [#entity{}]}).
+-type entities() :: #entities{}.
+
+-record(bot, {nick = <<>> :: binary(),
+              type = system :: 'system' | binary(),
+              entities = [] :: [#entity{}],
+              parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
 
 -record(inbox_entry, {unread :: 'undefined' | non_neg_integer(),
                       jid :: undefined | jid:jid(),
@@ -890,6 +919,10 @@
                     cred :: 'undefined' | binary()}).
 -type vcard_key() :: #vcard_key{}.
 
+-record(reply, {id = <<>> :: binary(),
+                to :: jid:jid()}).
+-type reply() :: #reply{}.
+
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
 -type inbox_query() :: #inbox_query{}.
 
@@ -898,6 +931,20 @@
                    lang = <<>> :: binary(),
                    name = <<>> :: binary()}).
 -type identity() :: #identity{}.
+
+-record(muc_destroy, {xmlns = <<>> :: binary(),
+                      jid :: undefined | jid:jid(),
+                      reason = <<>> :: binary(),
+                      password :: 'undefined' | binary()}).
+-type muc_destroy() :: #muc_destroy{}.
+
+-record(muc_user, {decline :: 'undefined' | #muc_decline{},
+                   destroy :: 'undefined' | #muc_destroy{},
+                   invites = [] :: [#muc_invite{}],
+                   items = [] :: [#muc_item{}],
+                   status_codes = [] :: [pos_integer()],
+                   password :: 'undefined' | binary()}).
+-type muc_user() :: #muc_user{}.
 
 -record(bookmark_conference, {name = <<>> :: binary(),
                               jid :: jid:jid(),
@@ -1259,6 +1306,7 @@
                         adhoc_actions() |
                         adhoc_command() |
                         adhoc_note() |
+                        apply_to() |
                         avatar_data() |
                         avatar_info() |
                         avatar_meta() |
@@ -1271,6 +1319,7 @@
                         bookmark_conference() |
                         bookmark_storage() |
                         bookmark_url() |
+                        bot() |
                         bytestreams() |
                         caps() |
                         carbons_disable() |
@@ -1295,7 +1344,11 @@
                         disco_info() |
                         disco_item() |
                         disco_items() |
+                        entities() |
+                        entity() |
                         expire() |
+                        fallback() |
+                        fb_body() |
                         feature_csi() |
                         feature_register() |
                         feature_sm() |
@@ -1356,6 +1409,8 @@
                         mix_roster_channel() |
                         mix_setnick() |
                         mix_update_subscription() |
+                        moderate() |
+                        moderated() |
                         muc() |
                         muc_actor() |
                         muc_admin() |
@@ -1406,7 +1461,11 @@
                         receipt_response() |
                         redirect() |
                         register() |
+                        replace() |
+                        reply() |
                         report() |
+                        retract() |
+                        retracted() |
                         roster_item() |
                         roster_query() |
                         rosterver_feature() |
