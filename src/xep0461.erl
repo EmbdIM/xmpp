@@ -155,7 +155,7 @@ decode_feature_fallback(__TopXMLNS, __Opts,
     Body = decode_feature_fallback_els(__TopXMLNS,
                                        __Opts,
                                        _els,
-                                       []),
+                                       undefined),
     For = decode_feature_fallback_attrs(__TopXMLNS,
                                         _attrs,
                                         undefined),
@@ -163,7 +163,7 @@ decode_feature_fallback(__TopXMLNS, __Opts,
 
 decode_feature_fallback_els(__TopXMLNS, __Opts, [],
                             Body) ->
-    lists:reverse(Body);
+    Body;
 decode_feature_fallback_els(__TopXMLNS, __Opts,
                             [{xmlel, <<"body">>, _attrs, _} = _el | _els],
                             Body) ->
@@ -175,10 +175,9 @@ decode_feature_fallback_els(__TopXMLNS, __Opts,
             decode_feature_fallback_els(__TopXMLNS,
                                         __Opts,
                                         _els,
-                                        [decode_feature_fallback_body(<<"urn:xmpp:feature-fallback:0">>,
-                                                                      __Opts,
-                                                                      _el)
-                                         | Body]);
+                                        decode_feature_fallback_body(<<"urn:xmpp:feature-fallback:0">>,
+                                                                     __Opts,
+                                                                     _el));
         _ ->
             decode_feature_fallback_els(__TopXMLNS,
                                         __Opts,
@@ -216,15 +215,12 @@ encode_feature_fallback({feature_fallback, For, Body},
                                                                          __TopXMLNS)),
     {xmlel, <<"fallback">>, _attrs, _els}.
 
-'encode_feature_fallback_$body'([], __TopXMLNS, _acc) ->
+'encode_feature_fallback_$body'(undefined, __TopXMLNS,
+                                _acc) ->
     _acc;
-'encode_feature_fallback_$body'([Body | _els],
-                                __TopXMLNS, _acc) ->
-    'encode_feature_fallback_$body'(_els,
-                                    __TopXMLNS,
-                                    [encode_feature_fallback_body(Body,
-                                                                  __TopXMLNS)
-                                     | _acc]).
+'encode_feature_fallback_$body'(Body, __TopXMLNS,
+                                _acc) ->
+    [encode_feature_fallback_body(Body, __TopXMLNS) | _acc].
 
 decode_feature_fallback_attr_for(__TopXMLNS,
                                  undefined) ->

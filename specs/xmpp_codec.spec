@@ -20,7 +20,7 @@
 		module = 'xep0461',
 		result = {feature_fallback, '$for', '$body'},
 		attrs = [#attr{name = <<"for">>}],
-		refs = [#ref{name = feature_fallback_body, label = '$body'}]}).
+		refs = [#ref{name = feature_fallback_body, min = 0, max = 1, label = '$body'}]}).
 
 -xml(feature_fallback_body,
 	#elem{name = <<"body">>,

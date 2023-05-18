@@ -507,7 +507,7 @@
 -type feature_fallback_body() :: #feature_fallback_body{}.
 
 -record(feature_fallback, {for = <<>> :: binary(),
-                           body = [] :: [#feature_fallback_body{}]}).
+                           body :: 'undefined' | #feature_fallback_body{}}).
 -type feature_fallback() :: #feature_fallback{}.
 
 -record(report, {reason :: 'abuse' | 'spam' | 'undefined',
