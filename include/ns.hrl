@@ -1,6 +1,6 @@
 %%%----------------------------------------------------------------------
 %%%
-%%% Copyright (C) 2002-2022 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2023 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -208,3 +208,8 @@
 -define(NS_STORAGE_BOOKMARKS, <<"storage:bookmarks">>).
 -define(NS_X509_0, <<"urn:xmpp:x509:0">>).
 -define(NS_HATS, <<"xmpp:prosody.im/protocol/hats:1">>).
+-define(NS_MESSAGE_MODERATE, <<"urn:xmpp:message-moderate:0">>).
+-define(NS_MESSAGE_RETRACT, <<"urn:xmpp:message-retract:0">>).
+-define(NS_REPLY, <<"urn:xmpp:reply:0">>).
+-define(NS_FEATURE_FALLBACK, <<"urn:xmpp:feature-fallback:0">>).
+-define(NS_MESSAGE_ENTITY, <<"urn:xmpp:message-entity">>).

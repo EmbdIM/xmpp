@@ -3,6 +3,85 @@
                data = <<>> :: binary()}).
 -type text() :: #text{}.
 
+-xml(reply,
+	#elem{name = <<"reply">>,
+	xmlns = <<"urn:xmpp:reply:0">>,
+	module = 'xep0461',
+	result = {reply, '$id', '$to'},
+	attrs = [#attr{name = <<"id">>},
+			 #attr{name = <<"to">>,
+				 required = true,
+				 dec = {jid, decode, []},
+				 enc = {jid, encode, []}}]}).
+
+-xml(feature_fallback,
+	#elem{name = <<"fallback">>,
+		xmlns = <<"urn:xmpp:feature-fallback:0">>,
+		module = 'xep0461',
+		result = {feature_fallback, '$for', '$body'},
+		attrs = [#attr{name = <<"for">>}],
+		refs = [#ref{name = feature_fallback_body, min = 0, max = 1, label = '$body'}]}).
+
+-xml(feature_fallback_body,
+	#elem{name = <<"body">>,
+		xmlns = <<"urn:xmpp:feature-fallback:0">>,
+		module = 'xep0461',
+		result = {feature_fallback_body, '$start', '$end'},
+		attrs = [#attr{name = <<"start">>,
+						required = true,
+						dec = {dec_int, [0, infinity]},
+						enc = {enc_int, []}},
+				 #attr{name = <<"end">>,
+					    required = true,
+						dec = {dec_int, [0, infinity]},
+						enc = {enc_int, []}}]}).
+
+-xml(bot,
+	#elem{name = <<"bot">>,
+		xmlns = <<"urn:deribit:system">>,
+		module = 'deribit_codec',
+		result = {bot, '$nick','$type', '$parse_mode'},
+		attrs = [#attr{name = <<"nick">>},
+				 #attr{name = <<"type">>, default = system},
+				 #attr{name = <<"parse_mode">>,
+					default = none,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[none, markdown, html]]}}]
+	}).
+
+-xml(message_entity,
+	#elem{name = <<"entity">>,
+		xmlns = <<"urn:xmpp:message-entity">>,
+		module = 'deribit_codec',
+		result = {message_entity, '$type', '$offset', '$length'},
+		attrs = [#attr{name = <<"type">>,
+					always_encode = true,
+					enc = {enc_enum, []},
+					dec = {dec_enum, [[bold, italic, underline, strikethrough, code, pre, text_link, mention, hashtag, monospace, spoiler, bot_command]]}},
+				#attr{name = <<"offset">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}},
+				#attr{name = <<"length">>,
+					default = 0,
+					dec = {dec_int, [0, infinity]},
+					enc = {enc_int, []}}]}).
+
+-xml(message_entities,
+	#elem{name = <<"entities">>,
+		xmlns = <<"urn:xmpp:message-entity">>,
+		module = 'deribit_codec',
+		result = {message_entities, '$items'},
+		refs = [#ref{name = message_entity, label = '$items'}]}).
+
+-xml(replace,
+#elem{name = <<"replace">>,
+	xmlns = <<"urn:xmpp:message-correct:0">>,
+	module = 'xep0424',
+	result = {replace, '$id'},
+	attrs = [#attr{name = <<"id">>}]}).
+
 -xml(jidprep,
      #elem{name = <<"jid">>,
 	   xmlns = <<"urn:xmpp:jidprep:0">>,
@@ -5081,6 +5160,73 @@
                           required = true},
                     #attr{name = <<"uri">>,
                           required = true}]}).
+
+-xml(fasten_apply_to,
+     #elem{name = <<"apply-to">>,
+	   xmlns = <<"urn:xmpp:fasten:0">>,
+	   module = 'xep0422',
+	   result = {fasten_apply_to, '$id', '$external', '$_els'},
+	   attrs = [#attr{name = <<"id">>,
+	                  required = true}],
+	   refs = [#ref{name = fasten_external, min = 0, max = 1,
+	                label = '$external'}]}).
+
+-xml(fasten_external,
+     #elem{name = <<"external">>,
+	   xmlns = <<"urn:xmpp:fasten:0">>,
+	   module = 'xep0422',
+	   result = {fasten_external, '$name'},
+           attrs = [#attr{name = <<"name">>,
+                          required = true}]}).
+
+-xml(message_retract,
+     #elem{name = <<"retract">>,
+	   xmlns = <<"urn:xmpp:message-retract:0">>,
+	   module = 'xep0424',
+	   result = {message_retract}}).
+
+-xml(message_retracted,
+     #elem{name = <<"retracted">>,
+	   xmlns = <<"urn:xmpp:message-retract:0">>,
+	   module = 'xep0424',
+	   result = {message_retracted, '$by', '$from', '$stamp', '$_els'},
+           attrs = [#attr{name = <<"by">>,
+                          enc = {jid, encode, []},
+                          dec = {jid, decode, []}},
+                    #attr{name = <<"from">>},
+                    #attr{name = <<"stamp">>,
+                          required = true,
+                          dec = {dec_utc, []},
+                          enc = {enc_utc, []}}]}).
+
+-xml(message_moderate,
+     #elem{name = <<"moderate">>,
+	   xmlns = <<"urn:xmpp:message-moderate:0">>,
+	   module = 'xep0425',
+	   result = {message_moderate, '$reason', '$retract'},
+	   refs = [#ref{name = message_moderate_reason, min = 0, max = 1,
+	                label = '$reason'},
+	           #ref{name = message_retract, min = 0, max = 1,
+	                label = '$retract'}]}).
+
+-xml(message_moderated,
+     #elem{name = <<"moderated">>,
+	   xmlns = <<"urn:xmpp:message-moderate:0">>,
+	   module = 'xep0425',
+	   result = {message_moderated, '$by', '$reason', '$retract', '$_els'},
+           attrs = [#attr{name = <<"by">>,
+                          enc = {jid, encode, []},
+                          dec = {jid, decode, []}}],
+	   refs = [#ref{name = message_moderate_reason, min = 0, max = 1,
+	                label = '$reason'},
+	           #ref{name = message_retract, min = 0, max = 1,
+	                label = '$retract'}]}).
+
+-xml(message_moderate_reason,
+     #elem{name = <<"reason">>,
+	   xmlns = <<"urn:xmpp:message-moderate:0">>,
+	   module = 'xep0425',
+	   result = '$cdata'}).
 
 -spec dec_tzo(_) -> {integer(), integer()}.
 dec_tzo(Val) ->
