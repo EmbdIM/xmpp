@@ -306,6 +306,10 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(message_upload, {url = <<>> :: binary(),
+                         title = <<>> :: binary()}).
+-type message_upload() :: #message_upload{}.
+
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -1268,6 +1272,10 @@
                           xmlns = <<>> :: binary()}).
 -type mix_client_join() :: #mix_client_join{}.
 
+-record(time, {tzo :: 'undefined' | {integer(),integer()},
+               utc :: undefined | erlang:timestamp()}).
+-type time() :: #time{}.
+
 -record(vcard_logo, {type :: 'undefined' | binary(),
                      binval :: 'undefined' | binary(),
                      extval :: 'undefined' | binary()}).
@@ -1304,10 +1312,6 @@
                      desc :: 'undefined' | binary(),
                      sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type vcard_temp() :: #vcard_temp{}.
-
--record(time, {tzo :: 'undefined' | {integer(),integer()},
-               utc :: undefined | erlang:timestamp()}).
--type time() :: #time{}.
 
 -type xmpp_element() :: address() |
                         addresses() |
@@ -1410,6 +1414,7 @@
                         message_retract() |
                         message_retracted() |
                         message_thread() |
+                        message_upload() |
                         mix() |
                         mix_client_join() |
                         mix_client_leave() |

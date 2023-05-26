@@ -18,6 +18,11 @@ do_decode(<<"entity">>, <<"urn:xmpp:message-entity">>,
 do_decode(<<"bot">>, <<"urn:deribit:system">>, El,
           Opts) ->
     decode_bot(<<"urn:deribit:system">>, Opts, El);
+do_decode(<<"upload">>, <<"urn:xmpp:upload:0">>, El,
+          Opts) ->
+    decode_message_upload(<<"urn:xmpp:upload:0">>,
+                          Opts,
+                          El);
 do_decode(Name, <<>>, _, _) ->
     erlang:error({xmpp_codec, {missing_tag_xmlns, Name}});
 do_decode(Name, XMLNS, _, _) ->
@@ -26,8 +31,11 @@ do_decode(Name, XMLNS, _, _) ->
 tags() ->
     [{<<"entities">>, <<"urn:xmpp:message-entity">>},
      {<<"entity">>, <<"urn:xmpp:message-entity">>},
-     {<<"bot">>, <<"urn:deribit:system">>}].
+     {<<"bot">>, <<"urn:deribit:system">>},
+     {<<"upload">>, <<"urn:xmpp:upload:0">>}].
 
+do_encode({message_upload, _, _} = Upload, TopXMLNS) ->
+    encode_message_upload(Upload, TopXMLNS);
 do_encode({bot, _, _, _} = Bot, TopXMLNS) ->
     encode_bot(Bot, TopXMLNS);
 do_encode({message_entity, _, _, _} = Entity,
@@ -38,21 +46,28 @@ do_encode({message_entities, _} = Entities, TopXMLNS) ->
 
 do_get_name({bot, _, _, _}) -> <<"bot">>;
 do_get_name({message_entities, _}) -> <<"entities">>;
-do_get_name({message_entity, _, _, _}) -> <<"entity">>.
+do_get_name({message_entity, _, _, _}) -> <<"entity">>;
+do_get_name({message_upload, _, _}) -> <<"upload">>.
 
 do_get_ns({bot, _, _, _}) -> <<"urn:deribit:system">>;
 do_get_ns({message_entities, _}) ->
     <<"urn:xmpp:message-entity">>;
 do_get_ns({message_entity, _, _, _}) ->
-    <<"urn:xmpp:message-entity">>.
+    <<"urn:xmpp:message-entity">>;
+do_get_ns({message_upload, _, _}) ->
+    <<"urn:xmpp:upload:0">>.
 
+pp(message_upload, 2) -> [url, title];
 pp(bot, 3) -> [nick, type, parse_mode];
 pp(message_entity, 3) -> [type, offset, length];
 pp(message_entities, 1) -> [items];
 pp(_, _) -> no.
 
 records() ->
-    [{bot, 3}, {message_entity, 3}, {message_entities, 1}].
+    [{message_upload, 2},
+     {bot, 3},
+     {message_entity, 3},
+     {message_entities, 1}].
 
 dec_enum(Val, Enums) ->
     AtomVal = erlang:binary_to_existing_atom(Val, utf8),
@@ -347,3 +362,66 @@ decode_bot_attr_parse_mode(__TopXMLNS, _val) ->
 
 encode_bot_attr_parse_mode(_val, _acc) ->
     [{<<"parse_mode">>, enc_enum(_val)} | _acc].
+
+decode_message_upload(__TopXMLNS, __Opts,
+                      {xmlel, <<"upload">>, _attrs, _els}) ->
+    {Url, Title} = decode_message_upload_attrs(__TopXMLNS,
+                                               _attrs,
+                                               undefined,
+                                               undefined),
+    {message_upload, Url, Title}.
+
+decode_message_upload_attrs(__TopXMLNS,
+                            [{<<"url">>, _val} | _attrs], _Url, Title) ->
+    decode_message_upload_attrs(__TopXMLNS,
+                                _attrs,
+                                _val,
+                                Title);
+decode_message_upload_attrs(__TopXMLNS,
+                            [{<<"title">>, _val} | _attrs], Url, _Title) ->
+    decode_message_upload_attrs(__TopXMLNS,
+                                _attrs,
+                                Url,
+                                _val);
+decode_message_upload_attrs(__TopXMLNS, [_ | _attrs],
+                            Url, Title) ->
+    decode_message_upload_attrs(__TopXMLNS,
+                                _attrs,
+                                Url,
+                                Title);
+decode_message_upload_attrs(__TopXMLNS, [], Url,
+                            Title) ->
+    {decode_message_upload_attr_url(__TopXMLNS, Url),
+     decode_message_upload_attr_title(__TopXMLNS, Title)}.
+
+encode_message_upload({message_upload, Url, Title},
+                      __TopXMLNS) ->
+    __NewTopXMLNS =
+        xmpp_codec:choose_top_xmlns(<<"urn:xmpp:upload:0">>,
+                                    [],
+                                    __TopXMLNS),
+    _els = [],
+    _attrs = encode_message_upload_attr_title(Title,
+                                              encode_message_upload_attr_url(Url,
+                                                                             xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+                                                                                                        __TopXMLNS))),
+    {xmlel, <<"upload">>, _attrs, _els}.
+
+decode_message_upload_attr_url(__TopXMLNS, undefined) ->
+    <<>>;
+decode_message_upload_attr_url(__TopXMLNS, _val) ->
+    _val.
+
+encode_message_upload_attr_url(<<>>, _acc) -> _acc;
+encode_message_upload_attr_url(_val, _acc) ->
+    [{<<"url">>, _val} | _acc].
+
+decode_message_upload_attr_title(__TopXMLNS,
+                                 undefined) ->
+    <<>>;
+decode_message_upload_attr_title(__TopXMLNS, _val) ->
+    _val.
+
+encode_message_upload_attr_title(<<>>, _acc) -> _acc;
+encode_message_upload_attr_title(_val, _acc) ->
+    [{<<"title">>, _val} | _acc].

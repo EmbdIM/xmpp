@@ -3,6 +3,14 @@
                data = <<>> :: binary()}).
 -type text() :: #text{}.
 
+-xml(message_upload,
+	#elem{name = <<"upload">>,
+	xmlns = <<"urn:xmpp:upload:0">>,
+	module = 'deribit_codec',
+	result = {message_upload, '$url', '$title'},
+	attrs = [#attr{name = <<"url">>},
+			 #attr{name = <<"title">>}]}).
+
 -xml(reply,
 	#elem{name = <<"reply">>,
 	xmlns = <<"urn:xmpp:reply:0">>,

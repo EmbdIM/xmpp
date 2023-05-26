@@ -969,6 +969,8 @@ get_mod(<<"DOM">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"default">>,
         <<"http://jabber.org/protocol/pubsub#owner">>) ->
     xep0060;
+get_mod(<<"upload">>, <<"urn:xmpp:upload:0">>) ->
+    deribit_codec;
 get_mod(<<"show">>, <<"jabber:client">>) -> rfc6120;
 get_mod(<<"FAX">>, <<"vcard-temp">>) -> xep0054;
 get_mod(<<"subscribe">>, <<"urn:xmpp:mucsub:0">>) ->
@@ -1750,6 +1752,7 @@ get_mod({carbons_enable}) -> xep0280;
 get_mod({carbons_private}) -> xep0280;
 get_mod({mix_roster_channel, _}) -> xep0405;
 get_mod({fasten_external, _}) -> xep0422;
+get_mod({message_upload, _, _}) -> deribit_codec;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({report, _, _}) -> xep0377;
 get_mod({message_thread, _, _}) -> rfc6120;
