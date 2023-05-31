@@ -621,6 +621,8 @@ get_mod(<<"description">>,
 get_mod(<<"checksum">>,
         <<"urn:xmpp:jingle:apps:file-transfer:5">>) ->
     xep0234;
+get_mod(<<"body">>, <<"urn:xmpp:upload:0">>) ->
+    deribit_codec;
 get_mod(<<"host-gone">>,
         <<"urn:ietf:params:xml:ns:xmpp-streams">>) ->
     rfc6120;
@@ -1752,7 +1754,6 @@ get_mod({carbons_enable}) -> xep0280;
 get_mod({carbons_private}) -> xep0280;
 get_mod({mix_roster_channel, _}) -> xep0405;
 get_mod({fasten_external, _}) -> xep0422;
-get_mod({message_upload, _, _}) -> deribit_codec;
 get_mod({privacy_list, _, _}) -> xep0016;
 get_mod({report, _, _}) -> xep0377;
 get_mod({message_thread, _, _}) -> rfc6120;
@@ -1976,11 +1977,13 @@ get_mod({muc_invite, _, _, _, _}) -> xep0045;
 get_mod({mix_client_join, _, _, _}) -> xep0405;
 get_mod({jingle_reason, _, _, _}) -> xep0166;
 get_mod({ps_event, _, _, _, _, _, _}) -> xep0060;
+get_mod({message_upload_body, _, _}) -> deribit_codec;
 get_mod({sasl_mechanisms, _}) -> rfc6120;
 get_mod({starttls, _}) -> rfc6120;
 get_mod({stream_start, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({credentials, _}) -> xep0215;
+get_mod({message_upload, _}) -> deribit_codec;
 get_mod({'see-other-host', _}) -> rfc6120;
 get_mod({muc_destroy, _, _, _, _}) -> xep0045;
 get_mod({hint, _}) -> xep0334;

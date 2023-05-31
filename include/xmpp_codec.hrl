@@ -201,6 +201,10 @@
                 desc = <<>> :: binary()}).
 -type delay() :: #delay{}.
 
+-record(message_upload_body, {url = <<>> :: binary(),
+                              title = <<>> :: binary()}).
+-type message_upload_body() :: #message_upload_body{}.
+
 -record(muc_history, {maxchars :: 'undefined' | non_neg_integer(),
                       maxstanzas :: 'undefined' | non_neg_integer(),
                       seconds :: 'undefined' | non_neg_integer(),
@@ -306,8 +310,7 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
--record(message_upload, {url = <<>> :: binary(),
-                         title = <<>> :: binary()}).
+-record(message_upload, {body = [] :: [#message_upload_body{}]}).
 -type message_upload() :: #message_upload{}.
 
 -record(jingle_content, {creator :: 'initiator' | 'responder',
@@ -1415,6 +1418,7 @@
                         message_retracted() |
                         message_thread() |
                         message_upload() |
+                        message_upload_body() |
                         mix() |
                         mix_client_join() |
                         mix_client_leave() |
