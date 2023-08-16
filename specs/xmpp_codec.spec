@@ -3,6 +3,21 @@
                data = <<>> :: binary()}).
 -type text() :: #text{}.
 
+-xml(message_upload,
+	#elem{name = <<"upload">>,
+	xmlns = <<"urn:xmpp:upload:0">>,
+	module = 'deribit_codec',
+	result = {message_upload, '$body'},
+	refs = [#ref{name = message_upload_body, min = 0, max = infinity, label = '$body'}]}).
+
+-xml(message_upload_body,
+	#elem{name = <<"body">>,
+	xmlns = <<"urn:xmpp:upload:0">>,
+	module = 'deribit_codec',
+	result = {message_upload_body, '$url', '$title'},
+	attrs = [#attr{name = <<"url">>, required = true},
+			 #attr{name = <<"title">>}]}).
+
 -xml(reply,
 	#elem{name = <<"reply">>,
 	xmlns = <<"urn:xmpp:reply:0">>,

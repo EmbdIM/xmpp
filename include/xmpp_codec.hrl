@@ -201,6 +201,10 @@
                 desc = <<>> :: binary()}).
 -type delay() :: #delay{}.
 
+-record(message_upload_body, {url = <<>> :: binary(),
+                              title = <<>> :: binary()}).
+-type message_upload_body() :: #message_upload_body{}.
+
 -record(muc_history, {maxchars :: 'undefined' | non_neg_integer(),
                       maxstanzas :: 'undefined' | non_neg_integer(),
                       seconds :: 'undefined' | non_neg_integer(),
@@ -305,6 +309,9 @@
 -record(message_thread, {parent = <<>> :: binary(),
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
+
+-record(message_upload, {body = [] :: [#message_upload_body{}]}).
+-type message_upload() :: #message_upload{}.
 
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
@@ -1268,6 +1275,10 @@
                           xmlns = <<>> :: binary()}).
 -type mix_client_join() :: #mix_client_join{}.
 
+-record(time, {tzo :: 'undefined' | {integer(),integer()},
+               utc :: undefined | erlang:timestamp()}).
+-type time() :: #time{}.
+
 -record(vcard_logo, {type :: 'undefined' | binary(),
                      binval :: 'undefined' | binary(),
                      extval :: 'undefined' | binary()}).
@@ -1304,10 +1315,6 @@
                      desc :: 'undefined' | binary(),
                      sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type vcard_temp() :: #vcard_temp{}.
-
--record(time, {tzo :: 'undefined' | {integer(),integer()},
-               utc :: undefined | erlang:timestamp()}).
--type time() :: #time{}.
 
 -type xmpp_element() :: address() |
                         addresses() |
@@ -1410,6 +1417,8 @@
                         message_retract() |
                         message_retracted() |
                         message_thread() |
+                        message_upload() |
+                        message_upload_body() |
                         mix() |
                         mix_client_join() |
                         mix_client_leave() |
