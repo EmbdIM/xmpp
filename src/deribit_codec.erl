@@ -242,7 +242,8 @@ decode_message_entity_attr_type(__TopXMLNS, _val) ->
                          hashtag,
                          monospace,
                          spoiler,
-                         bot_command])
+                         bot_command,
+                         json])
         of
         {'EXIT', _} ->
             erlang:error({xmpp_codec,

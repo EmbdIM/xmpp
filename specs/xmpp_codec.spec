@@ -73,7 +73,7 @@
 		attrs = [#attr{name = <<"type">>,
 					always_encode = true,
 					enc = {enc_enum, []},
-					dec = {dec_enum, [[bold, italic, underline, strikethrough, code, pre, text_link, mention, hashtag, monospace, spoiler, bot_command]]}},
+					dec = {dec_enum, [[bold, italic, underline, strikethrough, code, pre, text_link, mention, hashtag, monospace, spoiler, bot_command, json]]}},
 				#attr{name = <<"offset">>,
 					default = 0,
 					dec = {dec_int, [0, infinity]},

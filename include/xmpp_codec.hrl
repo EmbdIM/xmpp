@@ -374,7 +374,7 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
--record(message_entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline',
+-record(message_entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline' | 'json',
                          offset = 0 :: non_neg_integer(),
                          length = 0 :: non_neg_integer()}).
 -type message_entity() :: #message_entity{}.
