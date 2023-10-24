@@ -97,6 +97,21 @@
 	result = {replace, '$id'},
 	attrs = [#attr{name = <<"id">>}]}).
 
+-xml(payload_json,
+#elem{name = <<"json">>,
+	xmlns = <<"urn:xmpp:json:0">>,
+	module = 'xep0432',
+	result = {payload_json, '$data'},
+	cdata = #cdata{label = '$data'}}).
+
+-xml(message_payload,
+#elem{name = <<"payload">>,
+	xmlns = <<"urn:xmpp:json-msg:0">>,
+	module = 'xep0432',
+	result = {message_payload, '$datatype', '$json'},
+	attrs = [#attr{name = <<"datatype">>, label = '$datatype'}],
+	refs = [#ref{name = payload_json, min = 0, max = 1, label = '$json'}]}).
+
 -xml(jidprep,
      #elem{name = <<"jid">>,
 	   xmlns = <<"urn:xmpp:jidprep:0">>,

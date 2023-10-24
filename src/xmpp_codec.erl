@@ -1312,6 +1312,8 @@ get_mod(<<"delegation">>,
     xep0355;
 get_mod(<<"expired">>, <<"urn:xmpp:jingle:1">>) ->
     xep0166;
+get_mod(<<"payload">>, <<"urn:xmpp:json-msg:0">>) ->
+    xep0432;
 get_mod(<<"bad-request">>,
         <<"urn:ietf:params:xml:ns:xmpp-stanzas">>) ->
     rfc6120;
@@ -1656,6 +1658,7 @@ get_mod(<<"item">>,
 get_mod(<<"range">>,
         <<"urn:xmpp:jingle:apps:file-transfer:5">>) ->
     xep0234;
+get_mod(<<"json">>, <<"urn:xmpp:json:0">>) -> xep0432;
 get_mod(<<"client-leave">>, <<"urn:xmpp:mix:pam:2">>) ->
     xep0405;
 get_mod(<<"request">>, <<"urn:xmpp:http:upload">>) ->
@@ -1754,17 +1757,10 @@ get_mod({carbons_enable}) -> xep0280;
 get_mod({carbons_private}) -> xep0280;
 get_mod({mix_roster_channel, _}) -> xep0405;
 get_mod({fasten_external, _}) -> xep0422;
-get_mod({privacy_list, _, _}) -> xep0016;
-get_mod({report, _, _}) -> xep0377;
-get_mod({message_thread, _, _}) -> rfc6120;
 get_mod({shim, _}) -> xep0131;
 get_mod({mam_archived, _, _}) -> xep0313;
-get_mod({forwarded, _, _}) -> xep0297;
-get_mod({feature_sm, _}) -> xep0198;
-get_mod({stanza_id, _, _}) -> xep0359;
 get_mod({delegated, _, _}) -> xep0355;
 get_mod({text, _, _}) -> xep0234;
-get_mod({jingle_ft_received, _, _}) -> xep0234;
 get_mod({muc_hat, _, _}) -> xep0317;
 get_mod({bookmark_storage, _, _}) -> xep0048;
 get_mod({sasl_failure, _, _}) -> rfc6120;
@@ -1961,6 +1957,7 @@ get_mod({bob_data, _, _, _, _}) -> xep0231;
 get_mod({markable}) -> xep0333;
 get_mod({bind, _, _}) -> rfc6120;
 get_mod({rsm_first, _, _}) -> xep0059;
+get_mod({payload_json, _}) -> xep0432;
 get_mod({caps, _, _, _, _}) -> xep0115;
 get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
 get_mod({ps_options, _, _, _, _}) -> xep0060;
@@ -2036,4 +2033,12 @@ get_mod({jingle, _, _, _, _, _, _, _}) -> xep0166;
 get_mod({x509_csr, _, _}) -> xep0417;
 get_mod({services, _, _}) -> xep0215;
 get_mod({avatar_info, _, _, _, _, _, _}) -> xep0084;
+get_mod({message_payload, _, _}) -> xep0432;
+get_mod({privacy_list, _, _}) -> xep0016;
+get_mod({report, _, _}) -> xep0377;
+get_mod({message_thread, _, _}) -> rfc6120;
+get_mod({forwarded, _, _}) -> xep0297;
+get_mod({feature_sm, _}) -> xep0198;
+get_mod({stanza_id, _, _}) -> xep0359;
+get_mod({jingle_ft_received, _, _}) -> xep0234;
 get_mod(Record) -> xmpp_codec_external:lookup(Record).
