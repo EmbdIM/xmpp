@@ -1710,7 +1710,6 @@ get_mod({hash_used, _}) -> xep0300;
 get_mod({x509_ca_list, _}) -> xep0417;
 get_mod({disco_items, _, _, _}) -> xep0030;
 get_mod({vcard_xupdate, _}) -> xep0153;
-get_mod({bot, _, _, _}) -> deribit_codec;
 get_mod({block_item, _, _}) -> xep0191;
 get_mod({message, _, _, _, _, _, _, _, _, _, _}) ->
     rfc6120;
@@ -1772,6 +1771,7 @@ get_mod({adhoc_actions, _, _, _, _}) -> xep0050;
 get_mod({adhoc_note, _, _}) -> xep0050;
 get_mod({push_disable, _, _}) -> xep0357;
 get_mod({push_notification, _}) -> xep0357;
+get_mod({bot, _, _, _, _}) -> deribit_codec;
 get_mod({disco_item, _, _, _}) -> xep0030;
 get_mod({stat, _, _, _, _}) -> xep0039;
 get_mod({register,

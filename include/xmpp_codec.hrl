@@ -449,6 +449,7 @@
 
 -record(bot, {nick = <<>> :: binary(),
               type = system :: 'system' | binary(),
+              hash = <<>> :: binary(),
               parse_mode = none :: 'html' | 'markdown' | 'none'}).
 -type bot() :: #bot{}.
 
