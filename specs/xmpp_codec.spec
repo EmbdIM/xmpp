@@ -55,9 +55,10 @@
 	#elem{name = <<"bot">>,
 		xmlns = <<"urn:deribit:system">>,
 		module = 'deribit_codec',
-		result = {bot, '$nick','$type', '$parse_mode'},
+		result = {bot, '$nick','$type', '$hash', '$parse_mode'},
 		attrs = [#attr{name = <<"nick">>},
 				 #attr{name = <<"type">>, default = system},
+				 #attr{name = <<"hash">>},
 				 #attr{name = <<"parse_mode">>,
 					default = none,
 					always_encode = true,
@@ -96,6 +97,21 @@
 	module = 'xep0424',
 	result = {replace, '$id'},
 	attrs = [#attr{name = <<"id">>}]}).
+
+-xml(payload_json,
+#elem{name = <<"json">>,
+	xmlns = <<"urn:xmpp:json:0">>,
+	module = 'xep0432',
+	result = {payload_json, '$data'},
+	cdata = #cdata{label = '$data'}}).
+
+-xml(message_payload,
+#elem{name = <<"payload">>,
+	xmlns = <<"urn:xmpp:json-msg:0">>,
+	module = 'xep0432',
+	result = {message_payload, '$datatype', '$json'},
+	attrs = [#attr{name = <<"datatype">>, label = '$datatype'}],
+	refs = [#ref{name = payload_json, min = 0, max = 1, label = '$json'}]}).
 
 -xml(jidprep,
      #elem{name = <<"jid">>,

@@ -226,6 +226,9 @@
                    stanza = iq :: 'iq' | 'message'}).
 -type ibb_open() :: #ibb_open{}.
 
+-record(payload_json, {data = <<>> :: binary()}).
+-type payload_json() :: #payload_json{}.
+
 -record(muc_decline, {reason = <<>> :: binary(),
                       from :: undefined | jid:jid(),
                       to :: undefined | jid:jid()}).
@@ -310,6 +313,10 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(message_payload, {datatype = <<>> :: binary(),
+                          json :: 'undefined' | #payload_json{}}).
+-type message_payload() :: #message_payload{}.
+
 -record(message_upload, {body = [] :: [#message_upload_body{}]}).
 -type message_upload() :: #message_upload{}.
 
@@ -374,7 +381,7 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
--record(message_entity, {type :: 'bold' | 'bot_command' | 'code' | 'hashtag' | 'italic' | 'mention' | 'monospace' | 'pre' | 'spoiler' | 'strikethrough' | 'text_link' | 'undefined' | 'underline' | 'json',
+-record(message_entity, {type :: atom(),
                          offset = 0 :: non_neg_integer(),
                          length = 0 :: non_neg_integer()}).
 -type message_entity() :: #message_entity{}.
@@ -442,6 +449,7 @@
 
 -record(bot, {nick = <<>> :: binary(),
               type = system :: 'system' | binary(),
+              hash = <<>> :: binary(),
               parse_mode = none :: 'html' | 'markdown' | 'none'}).
 -type bot() :: #bot{}.
 
@@ -1414,6 +1422,7 @@
                         message_entity() |
                         message_moderate() |
                         message_moderated() |
+                        message_payload() |
                         message_retract() |
                         message_retracted() |
                         message_thread() |
@@ -1453,6 +1462,7 @@
                         offline_item() |
                         oob_x() |
                         origin_id() |
+                        payload_json() |
                         ping() |
                         presence() |
                         privacy_item() |
