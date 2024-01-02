@@ -206,10 +206,11 @@
 -define(NS_PEP_VCARD_CONVERSION_0, <<"urn:xmpp:pep-vcard-conversion:0">>).
 -define(NS_BOOKMARKS_CONVERSION_0, <<"urn:xmpp:bookmarks-conversion:0">>).
 -define(NS_STORAGE_BOOKMARKS, <<"storage:bookmarks">>).
+-define(NS_PEP_BOOKMARKS, <<"urn:xmpp:bookmarks:1">>).
+-define(NS_PEP_BOOKMARKS_COMPAT, <<"urn:xmpp:bookmarks:1#compat">>).
+-define(NS_PEP_BOOKMARKS_COMPAT_PEP, <<"urn:xmpp:bookmarks:1#compat-pep">>).
 -define(NS_X509_0, <<"urn:xmpp:x509:0">>).
 -define(NS_HATS, <<"xmpp:prosody.im/protocol/hats:1">>).
 -define(NS_MESSAGE_MODERATE, <<"urn:xmpp:message-moderate:0">>).
--define(NS_MESSAGE_RETRACT, <<"urn:xmpp:message-retract:0">>).
--define(NS_REPLY, <<"urn:xmpp:reply:0">>).
--define(NS_FEATURE_FALLBACK, <<"urn:xmpp:feature-fallback:0">>).
--define(NS_MESSAGE_ENTITY, <<"urn:xmpp:message-entity">>).
+-define(NS_MESSAGE_RETRACT, <<"urn:xmpp:message-retract:1">>).
+-define(NS_OCCUPANT_ID, <<"urn:xmpp:occupant-id:0">>).
