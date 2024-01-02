@@ -45,8 +45,12 @@
 	 pp/1,
 	 sockname/1,
 	 peername/1,
-	 send_ws_ping/1, get_negotiated_cipher/1, get_tls_last_message/2,
-	 release/1]).
+	 send_ws_ping/1,
+	 get_negotiated_cipher/1,
+	 get_tls_last_message/2,
+	 release/1,
+	 get_tls_cb_exporter/1,
+	 get_tls_cert_hash/1]).
 
 -include("xmpp.hrl").
 -include_lib("public_key/include/public_key.hrl").
@@ -68,7 +72,8 @@
 		       max_stanza_size   :: timeout(),
 		       xml_stream :: undefined | fxml_stream:xml_stream_state(),
 		       shaper = none :: none | p1_shaper:state(),
-		       sock_peer_name = none :: none | {endpoint(), endpoint()}}).
+		       sock_peer_name = none :: none | {endpoint(), endpoint()},
+		       tls_certfile = none :: none | binary()}).
 
 -type socket_state() :: #socket_state{}.
 
@@ -168,7 +173,8 @@ starttls(#socket_state{sockmod = gen_tcp,
     case fast_tls:tcp_to_tls(Socket, TLSOpts) of
 	{ok, TLSSocket} ->
 	    SocketData1 = SocketData#socket_state{socket = TLSSocket,
-						  sockmod = fast_tls},
+						  sockmod = fast_tls,
+						  tls_certfile = proplists:get_value(certfile, TLSOpts, none)},
 	    SocketData2 = reset_stream(SocketData1),
 	    case fast_tls:recv_data(TLSSocket, <<>>) of
 		{ok, TLSData} ->
@@ -347,6 +353,36 @@ get_peer_certificate(#socket_state{sockmod = SockMod,
 	false -> error
     end.
 
+-spec get_tls_cert_hash(socket_state()) -> {ok, binary()} | error.
+get_tls_cert_hash(#socket_state{tls_certfile = none}) ->
+    error;
+get_tls_cert_hash(#socket_state{tls_certfile = Path}) ->
+    case file:read_file(Path) of
+	{ok, Content} ->
+	    try lists:keyfind('Certificate', 1, public_key:pem_decode(Content)) of
+		{'Certificate', Cert, not_encrypted} ->
+		    try public_key:pkix_decode_cert(Cert, otp) of
+			#'OTPCertificate'{signatureAlgorithm = #'SignatureAlgorithm'{algorithm = Algo}} ->
+			    Hash = case public_key:pkix_sign_types(Algo) of
+				{sha, _} -> sha256;
+				{md5, _} -> sha256;
+				{Hash2, _} -> Hash2
+			    end,
+			    {ok, crypto:hash(Hash, Cert)};
+			_ ->
+			    error
+		    catch _:_ ->
+			error
+		    end;
+		_ ->
+		    error
+	    catch _:_ ->
+		error
+	    end;
+	_ ->
+	    error
+    end.
+
 -spec get_negotiated_cipher(socket_state()) -> {ok, binary()} | error.
 get_negotiated_cipher(#socket_state{sockmod = SockMod,
 				    socket = Socket}) ->
@@ -360,6 +396,14 @@ get_tls_last_message(#socket_state{sockmod = SockMod,
 				    socket = Socket}, Type) ->
     case erlang:function_exported(SockMod, get_tls_last_message, 2) of
 	true -> SockMod:get_tls_last_message(Type, Socket);
+	false -> {error, unavailable}
+    end.
+
+-spec get_tls_cb_exporter(socket_state()) -> {ok, binary()} | {error, term()}.
+get_tls_cb_exporter(#socket_state{sockmod = SockMod,
+				  socket = Socket}) ->
+    case erlang:function_exported(SockMod, get_tls_cb_exporter, 1) of
+	true -> SockMod:get_tls_cb_exporter(Socket);
 	false -> {error, unavailable}
     end.
 

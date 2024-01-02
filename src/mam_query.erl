@@ -32,34 +32,9 @@
          format_error/1,
          io_format_error/1]).
 
--include_lib("xmpp/include/xmpp_codec.hrl").
+-include("xmpp_codec.hrl").
 
-%% Created automatically by xdata generator (xdata_codec.erl)
-%% Source: mam_query.xdata
-%% Form type: urn:xmpp:mam:1
-%% Document: XEP-0313
-
--type property() :: {'with', jid:jid()} |
-                    {'start', erlang:timestamp()} |
-                    {'end', erlang:timestamp()} |
-                    {'withtext', binary()} |
-                    {'with_nick', binary()}.
--type result() :: [property()].
-
--type form_property() ::
-    {'with', jid:jid() | undefined} |
-    {'start', erlang:timestamp() | undefined} |
-    {'end', erlang:timestamp() | undefined} |
-    {'withtext', binary()} |
-    {'with_nick', binary()}.
--type form() :: [form_property() | xdata_field()].
-
--type error_reason() :: {form_type_mismatch, binary()} |
-                        {bad_var_value, binary(), binary()} |
-                        {missing_required_var, binary(), binary()} |
-                        {missing_value, binary(), binary()} |
-                        {too_many_values, binary(), binary()} |
-                        {unknown_var, binary(), binary()}.
+-include("mam_query.hrl").
 
 -export_type([property/0,
               result/0,
@@ -92,11 +67,7 @@
 -spec encode(form(), binary()) -> [xdata_field()].
 
 -spec encode(form(), binary(),
-             [with |
-              start |
-              'end' |
-              withtext |
-              with_nick]) -> [xdata_field()].
+             [with | start | 'end' | withtext]) -> [xdata_field()].
 
 dec_int(Val) -> dec_int(Val, infinity, infinity).
 
@@ -226,10 +197,6 @@ encode(List, Lang, Required) ->
                   [encode_withtext(Val,
                                    Lang,
                                    lists:member(withtext, Required))];
-              {with_nick, Val} ->
-                  [encode_with_nick(Val,
-                                    Lang,
-                                    lists:member(with_nick, Required))];
               #xdata_field{} -> [Opt]
           end
           || Opt <- List],
@@ -355,36 +322,6 @@ do_decode([#xdata_field{var = <<"withtext">>} | _],
           XMLNS, _, _) ->
     erlang:error({?MODULE,
                   {too_many_values, <<"withtext">>, XMLNS}});
-do_decode([#xdata_field{var = <<"with_nick">>,
-                        values = [Value]}
-           | Fs],
-          XMLNS, Required, Acc) ->
-    try Value of
-        Result ->
-            do_decode(Fs,
-                      XMLNS,
-                      lists:delete(<<"with_nick">>, Required),
-                      [{with_nick, Result} | Acc])
-    catch
-        _:_ ->
-            erlang:error({?MODULE,
-                          {bad_var_value, <<"with_nick">>, XMLNS}})
-    end;
-do_decode([#xdata_field{var = <<"with_nick">>,
-                        values = []} =
-               F
-           | Fs],
-          XMLNS, Required, Acc) ->
-    do_decode([F#xdata_field{var = <<"with_nick">>,
-                             values = [<<>>]}
-               | Fs],
-              XMLNS,
-              Required,
-              Acc);
-do_decode([#xdata_field{var = <<"with_nick">>} | _],
-          XMLNS, _, _) ->
-    erlang:error({?MODULE,
-                  {too_many_values, <<"with_nick">>, XMLNS}});
 do_decode([#xdata_field{var = Var} | Fs], XMLNS,
           Required, Acc) ->
     if Var /= <<"FORM_TYPE">> ->
@@ -451,17 +388,3 @@ encode_withtext(Value, Lang, IsRequired) ->
                  required = IsRequired, type = 'text-single',
                  options = Opts, desc = <<>>,
                  label = xmpp_tr:tr(Lang, ?T("Search the text"))}.
-
--spec encode_with_nick(binary(), binary(),
-                       boolean()) -> xdata_field().
-
-encode_with_nick(Value, Lang, IsRequired) ->
-    Values = case Value of
-                 <<>> -> [];
-                 Value -> [Value]
-             end,
-    Opts = [],
-    #xdata_field{var = <<"with_nick">>, values = Values,
-                 required = IsRequired, type = 'text-single',
-                 options = Opts, desc = <<>>,
-                 label = xmpp_tr:tr(Lang, ?T("Search by nick"))}.

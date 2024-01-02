@@ -14,9 +14,6 @@
   <field var='withtext'
 	 type='text-single'
 	 label='Search the text'/>
-  <field var='with_nick'
-	 type='text-single'
-	 label='Search by nick'/>
 </form_type>
 
 <!--
