@@ -139,15 +139,12 @@
                     data = <<>> :: binary()}).
 -type rsm_first() :: #rsm_first{}.
 
--record(mark_received, {id = <<>> :: binary()}).
--type mark_received() :: #mark_received{}.
-
 -record(streamhost, {jid :: jid:jid(),
                      host = <<>> :: binary(),
                      port = 1080 :: non_neg_integer()}).
 -type streamhost() :: #streamhost{}.
 
--record(message_retract, {}).
+-record(message_retract, {id = <<>> :: binary()}).
 -type message_retract() :: #message_retract{}.
 
 -record(x509_challenge_failed, {}).
@@ -159,6 +156,9 @@
 -record(mark_acknowledged, {id = <<>> :: binary()}).
 -type mark_acknowledged() :: #mark_acknowledged{}.
 
+-record(mark_received, {id = <<>> :: binary()}).
+-type mark_received() :: #mark_received{}.
+
 -record(carbons_enable, {}).
 -type carbons_enable() :: #carbons_enable{}.
 
@@ -166,8 +166,8 @@
                      xmlns = <<>> :: binary()}).
 -type mix_create() :: #mix_create{}.
 
--record(carbons_private, {}).
--type carbons_private() :: #carbons_private{}.
+-record(sasl2_response, {text = <<>> :: binary()}).
+-type sasl2_response() :: #sasl2_response{}.
 
 -record(receipt_response, {id = <<>> :: binary()}).
 -type receipt_response() :: #receipt_response{}.
@@ -178,6 +178,11 @@
 
 -record(mix_leave, {xmlns = <<>> :: binary()}).
 -type mix_leave() :: #mix_leave{}.
+
+-record(sasl2_user_agent, {id = <<>> :: binary(),
+                           software :: 'undefined' | binary(),
+                           device :: 'undefined' | binary()}).
+-type sasl2_user_agent() :: #sasl2_user_agent{}.
 
 -record(muc_unsubscribe, {nick = <<>> :: binary(),
                           jid :: undefined | jid:jid()}).
@@ -192,6 +197,9 @@
                     previd = <<>> :: binary(),
                     xmlns = <<>> :: binary()}).
 -type sm_resume() :: #sm_resume{}.
+
+-record(carbons_private, {}).
+-type carbons_private() :: #carbons_private{}.
 
 -record(ping, {}).
 -type ping() :: #ping{}.
@@ -245,14 +253,14 @@
                            xmlns = <<>> :: binary()}).
 -type upload_request_0() :: #upload_request_0{}.
 
+-record(sm_a, {h :: non_neg_integer(),
+               xmlns = <<>> :: binary()}).
+-type sm_a() :: #sm_a{}.
+
 -record(ibb_data, {sid = <<>> :: binary(),
                    seq :: non_neg_integer(),
                    data = <<>> :: binary()}).
 -type ibb_data() :: #ibb_data{}.
-
--record(sm_a, {h :: non_neg_integer(),
-               xmlns = <<>> :: binary()}).
--type sm_a() :: #sm_a{}.
 
 -record(x509_csr, {name = <<>> :: binary(),
                    der = <<>> :: binary()}).
@@ -327,9 +335,6 @@
                          sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type jingle_content() :: #jingle_content{}.
 
--record(sasl_challenge, {text = <<>> :: binary()}).
--type sasl_challenge() :: #sasl_challenge{}.
-
 -record(handshake, {data = <<>> :: binary()}).
 -type handshake() :: #handshake{}.
 
@@ -359,6 +364,12 @@
 
 -record(gone, {uri = <<>> :: binary()}).
 -type gone() :: #gone{}.
+
+-record(sasl_challenge, {text = <<>> :: binary()}).
+-type sasl_challenge() :: #sasl_challenge{}.
+
+-record(sasl_channel_binding, {bindings = [] :: [binary()]}).
+-type sasl_channel_binding() :: #sasl_channel_binding{}.
 
 -record(hash, {algo = <<>> :: binary(),
                data = <<>> :: binary()}).
@@ -441,11 +452,16 @@
                status = <<>> :: binary()}).
 -type last() :: #last{}.
 
--record(message_retracted, {by :: undefined | jid:jid(),
+-record(message_retracted, {id = <<>> :: binary(),
+                            by :: undefined | jid:jid(),
                             from = <<>> :: binary(),
                             stamp :: erlang:timestamp(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type message_retracted() :: #message_retracted{}.
+
+-record(sasl2_abort, {text :: 'undefined' | binary(),
+                      sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_abort() :: #sasl2_abort{}.
 
 -record(bot, {nick = <<>> :: binary(),
               type = system :: 'system' | binary(),
@@ -499,6 +515,18 @@
 
 -record(sasl_response, {text = <<>> :: binary()}).
 -type sasl_response() :: #sasl_response{}.
+
+-record(sasl2_continue, {additional_data :: 'undefined' | binary(),
+                         text :: 'undefined' | binary(),
+                         tasks :: 'undefined' | [binary()],
+                         sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_continue() :: #sasl2_continue{}.
+
+-record(sasl2_authenticate, {mechanism = <<>> :: binary(),
+                             initial_response :: 'undefined' | binary(),
+                             user_agent :: 'undefined' | #sasl2_user_agent{},
+                             sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_authenticate() :: #sasl2_authenticate{}.
 
 -record(x509_revoke, {cert :: binary(),
                       signature :: binary()}).
@@ -567,6 +595,10 @@
                           expiry :: undefined | erlang:timestamp()}).
 -type ps_subscription() :: #ps_subscription{}.
 
+-record(sasl2_authenticaton, {mechanisms = [] :: [binary()],
+                              inline :: 'undefined' | [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_authenticaton() :: #sasl2_authenticaton{}.
+
 -record(message_moderate, {reason :: 'undefined' | binary(),
                            retract :: 'undefined' | #message_retract{}}).
 -type message_moderate() :: #message_moderate{}.
@@ -616,6 +648,11 @@
                exts = [] :: [binary()]}).
 -type caps() :: #caps{}.
 
+-record(sasl2_success, {jid :: jid:jid(),
+                        additional_data :: 'undefined' | binary(),
+                        sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_success() :: #sasl2_success{}.
+
 -record(muc, {history :: 'undefined' | #muc_history{},
               password :: 'undefined' | binary()}).
 -type muc() :: #muc{}.
@@ -645,6 +682,9 @@
               port :: 'undefined' | non_neg_integer(),
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
+
+-record(bind2_bound, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type bind2_bound() :: #bind2_bound{}.
 
 -record(message_moderated, {by :: undefined | jid:jid(),
                             reason :: 'undefined' | binary(),
@@ -678,6 +718,15 @@
                      items = [] :: [#ps_item{}]}).
 -type ps_retract() :: #ps_retract{}.
 
+-record(sasl2_failure, {reason :: 'aborted' | 'account-disabled' | 'bad-protocol' | 'credentials-expired' | 'encryption-required' | 'incorrect-encoding' | 'invalid-authzid' | 'invalid-mechanism' | 'malformed-request' | 'mechanism-too-weak' | 'not-authorized' | 'temporary-auth-failure' | 'undefined',
+                        text :: 'undefined' | binary(),
+                        sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_failure() :: #sasl2_failure{}.
+
+-record(sasl_failure, {reason :: 'aborted' | 'account-disabled' | 'bad-protocol' | 'credentials-expired' | 'encryption-required' | 'incorrect-encoding' | 'invalid-authzid' | 'invalid-mechanism' | 'malformed-request' | 'mechanism-too-weak' | 'not-authorized' | 'temporary-auth-failure' | 'undefined',
+                       text = [] :: [#text{}]}).
+-type sasl_failure() :: #sasl_failure{}.
+
 -record(muc_hat, {title = <<>> :: binary(),
                   uri = <<>> :: binary()}).
 -type muc_hat() :: #muc_hat{}.
@@ -689,9 +738,8 @@
                     lon :: 'undefined' | binary()}).
 -type vcard_geo() :: #vcard_geo{}.
 
--record(sasl_failure, {reason :: 'aborted' | 'account-disabled' | 'bad-protocol' | 'credentials-expired' | 'encryption-required' | 'incorrect-encoding' | 'invalid-authzid' | 'invalid-mechanism' | 'malformed-request' | 'mechanism-too-weak' | 'not-authorized' | 'temporary-auth-failure' | 'undefined',
-                       text = [] :: [#text{}]}).
--type sasl_failure() :: #sasl_failure{}.
+-record(occupant_id, {id = <<>> :: binary()}).
+-type occupant_id() :: #occupant_id{}.
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
@@ -777,6 +825,12 @@
 -record(rosterver_feature, {}).
 -type rosterver_feature() :: #rosterver_feature{}.
 
+-record(bind2_feature, {var = <<>> :: binary()}).
+-type bind2_feature() :: #bind2_feature{}.
+
+-record(sasl2_challenge, {text = <<>> :: binary()}).
+-type sasl2_challenge() :: #sasl2_challenge{}.
+
 -record(x509_challenge, {transaction = <<>> :: binary(),
                          uri = <<>> :: binary(),
                          signature :: binary()}).
@@ -846,6 +900,13 @@
                                error :: 'candidate-error' | 'proxy-error' | 'undefined'}).
 -type jingle_s5b_transport() :: #jingle_s5b_transport{}.
 
+-record(pep_bookmarks_conference, {name = <<>> :: binary(),
+                                   autojoin = false :: boolean(),
+                                   nick :: 'undefined' | binary(),
+                                   password :: 'undefined' | binary(),
+                                   extensions :: 'undefined' | [xmpp_element() | fxml:xmlel()]}).
+-type pep_bookmarks_conference() :: #pep_bookmarks_conference{}.
+
 -record(delegated, {ns = <<>> :: binary(),
                     attrs = [] :: [binary()]}).
 -type delegated() :: #delegated{}.
@@ -867,6 +928,11 @@
 -record(vcard_org, {name :: 'undefined' | binary(),
                     units = [] :: [binary()]}).
 -type vcard_org() :: #vcard_org{}.
+
+-record(bind2_bind, {tag :: 'undefined' | binary(),
+                     inline :: 'undefined' | [xmpp_element() | fxml:xmlel()],
+                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type bind2_bind() :: #bind2_bind{}.
 
 -record(vcard_tel, {home = false :: boolean(),
                     work = false :: boolean(),
@@ -1001,7 +1067,8 @@
 
 -record(oob_x, {url :: binary(),
                 desc = <<>> :: binary(),
-                sid = <<>> :: binary()}).
+                sid = <<>> :: binary(),
+                sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type oob_x() :: #oob_x{}.
 
 -record(vcard_sound, {phonetic :: 'undefined' | binary(),
@@ -1334,6 +1401,9 @@
                         avatar_meta() |
                         avatar_pointer() |
                         bind() |
+                        bind2_bind() |
+                        bind2_bound() |
+                        bind2_feature() |
                         block() |
                         block_item() |
                         block_list() |
@@ -1458,11 +1528,13 @@
                         muc_unsubscribe() |
                         muc_user() |
                         nick() |
+                        occupant_id() |
                         offline() |
                         offline_item() |
                         oob_x() |
                         origin_id() |
                         payload_json() |
+                        pep_bookmarks_conference() |
                         ping() |
                         presence() |
                         privacy_item() |
@@ -1499,9 +1571,19 @@
                         rosterver_feature() |
                         rsm_first() |
                         rsm_set() |
+                        sasl2_abort() |
+                        sasl2_authenticate() |
+                        sasl2_authenticaton() |
+                        sasl2_challenge() |
+                        sasl2_continue() |
+                        sasl2_failure() |
+                        sasl2_response() |
+                        sasl2_success() |
+                        sasl2_user_agent() |
                         sasl_abort() |
                         sasl_auth() |
                         sasl_challenge() |
+                        sasl_channel_binding() |
                         sasl_failure() |
                         sasl_mechanisms() |
                         sasl_response() |
