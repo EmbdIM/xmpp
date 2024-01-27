@@ -5222,8 +5222,7 @@
 	   xmlns = [<<"urn:xmpp:message-retract:0">>, <<"urn:xmpp:message-retract:1">>],
 	   module = 'xep0424',
 	   result = {message_retract, '$id'},
-	   attrs = [#attr{name = <<"id">>,
-	                  required = true}]}).
+	   attrs = [#attr{name = <<"id">>}]}).
 
 -xml(message_retracted,
      #elem{name = <<"retracted">>,

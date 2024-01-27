@@ -305,11 +305,11 @@ encode_message_retract({message_retract, Id},
     {xmlel, <<"retract">>, _attrs, _els}.
 
 decode_message_retract_attr_id(__TopXMLNS, undefined) ->
-    erlang:error({xmpp_codec,
-                  {missing_attr, <<"id">>, <<"retract">>, __TopXMLNS}});
+    <<>>;
 decode_message_retract_attr_id(__TopXMLNS, _val) ->
     _val.
 
+encode_message_retract_attr_id(<<>>, _acc) -> _acc;
 encode_message_retract_attr_id(_val, _acc) ->
     [{<<"id">>, _val} | _acc].
 
