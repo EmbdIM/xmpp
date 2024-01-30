@@ -6,10 +6,20 @@
 -compile(export_all).
 
 do_decode(<<"retracted">>,
+          <<"urn:xmpp:message-retract:0">>, El, Opts) ->
+    decode_message_retracted(<<"urn:xmpp:message-retract:0">>,
+                             Opts,
+                             El);
+do_decode(<<"retracted">>,
           <<"urn:xmpp:message-retract:1">>, El, Opts) ->
     decode_message_retracted(<<"urn:xmpp:message-retract:1">>,
                              Opts,
                              El);
+do_decode(<<"retract">>,
+          <<"urn:xmpp:message-retract:0">>, El, Opts) ->
+    decode_message_retract(<<"urn:xmpp:message-retract:0">>,
+                           Opts,
+                           El);
 do_decode(<<"retract">>,
           <<"urn:xmpp:message-retract:1">>, El, Opts) ->
     decode_message_retract(<<"urn:xmpp:message-retract:1">>,
@@ -26,7 +36,9 @@ do_decode(Name, XMLNS, _, _) ->
     erlang:error({xmpp_codec, {unknown_tag, Name, XMLNS}}).
 
 tags() ->
-    [{<<"retracted">>, <<"urn:xmpp:message-retract:1">>},
+    [{<<"retracted">>, <<"urn:xmpp:message-retract:0">>},
+     {<<"retracted">>, <<"urn:xmpp:message-retract:1">>},
+     {<<"retract">>, <<"urn:xmpp:message-retract:0">>},
      {<<"retract">>, <<"urn:xmpp:message-retract:1">>},
      {<<"replace">>, <<"urn:xmpp:message-correct:0">>}].
 
@@ -45,9 +57,9 @@ do_get_name({message_retracted, _, _, _, _, _}) ->
 do_get_name({replace, _}) -> <<"replace">>.
 
 do_get_ns({message_retract, _}) ->
-    <<"urn:xmpp:message-retract:1">>;
+    <<"urn:xmpp:message-retract:0">>;
 do_get_ns({message_retracted, _, _, _, _, _}) ->
-    <<"urn:xmpp:message-retract:1">>;
+    <<"urn:xmpp:message-retract:0">>;
 do_get_ns({replace, _}) ->
     <<"urn:xmpp:message-correct:0">>.
 
@@ -190,10 +202,10 @@ encode_message_retracted({message_retracted,
                           Stamp,
                           __Els},
                          __TopXMLNS) ->
-    __NewTopXMLNS =
-        xmpp_codec:choose_top_xmlns(<<"urn:xmpp:message-retract:1">>,
-                                    [],
-                                    __TopXMLNS),
+    __NewTopXMLNS = xmpp_codec:choose_top_xmlns(<<>>,
+                                                [<<"urn:xmpp:message-retract:0">>,
+                                                 <<"urn:xmpp:message-retract:1">>],
+                                                __TopXMLNS),
     _els = [xmpp_codec:encode(_el, __NewTopXMLNS)
             || _el <- __Els],
     _attrs = encode_message_retracted_attr_stamp(Stamp,
@@ -282,10 +294,10 @@ decode_message_retract_attrs(__TopXMLNS, [], Id) ->
 
 encode_message_retract({message_retract, Id},
                        __TopXMLNS) ->
-    __NewTopXMLNS =
-        xmpp_codec:choose_top_xmlns(<<"urn:xmpp:message-retract:1">>,
-                                    [],
-                                    __TopXMLNS),
+    __NewTopXMLNS = xmpp_codec:choose_top_xmlns(<<>>,
+                                                [<<"urn:xmpp:message-retract:0">>,
+                                                 <<"urn:xmpp:message-retract:1">>],
+                                                __TopXMLNS),
     _els = [],
     _attrs = encode_message_retract_attr_id(Id,
                                             xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
@@ -293,11 +305,11 @@ encode_message_retract({message_retract, Id},
     {xmlel, <<"retract">>, _attrs, _els}.
 
 decode_message_retract_attr_id(__TopXMLNS, undefined) ->
-    erlang:error({xmpp_codec,
-                  {missing_attr, <<"id">>, <<"retract">>, __TopXMLNS}});
+    <<>>;
 decode_message_retract_attr_id(__TopXMLNS, _val) ->
     _val.
 
+encode_message_retract_attr_id(<<>>, _acc) -> _acc;
 encode_message_retract_attr_id(_val, _acc) ->
     [{<<"id">>, _val} | _acc].
 
