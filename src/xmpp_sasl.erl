@@ -1,6 +1,6 @@
 %%%-------------------------------------------------------------------
 %%%
-%%% Copyright (C) 2002-2023 ProcessOne, SARL. All Rights Reserved.
+%%% Copyright (C) 2002-2024 ProcessOne, SARL. All Rights Reserved.
 %%%
 %%% Licensed under the Apache License, Version 2.0 (the "License");
 %%% you may not use this file except in compliance with the License.
@@ -105,7 +105,7 @@ server_new(ServerHost, GetPassword, CheckPassword, CheckPasswordDigest) ->
 		check_password_digest = CheckPasswordDigest}.
 
 -spec server_start(sasl_state(), mechanism(), binary(), channel_bindings(),
-  list(binary())) -> sasl_return().
+  list(binary()) | undefined) -> sasl_return().
 server_start(State, Mech, ClientIn, ChannelBindings, Mechs) ->
     case get_mod(Mech) of
 	undefined ->
