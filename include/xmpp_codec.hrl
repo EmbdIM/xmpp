@@ -2,88 +2,88 @@
 %% Source: xmpp_codec.spec
 
 -record(text, {lang = <<>> :: binary(),
-               data = <<>> :: binary()}).
+	data = <<>> :: binary()}).
 -type text() :: #text{}.
 
 -type iq_type() :: get | set | result | error.
 -type message_type() :: chat | error | groupchat | headline | normal.
 -type presence_type() :: available | error | probe | subscribe |
-			 subscribed | unavailable | unsubscribe |
-			 unsubscribed.
+subscribed | unavailable | unsubscribe |
+unsubscribed.
 
 -record(iq, {id = <<>> :: binary(),
-             type :: iq_type(),
-             lang = <<>> :: binary(),
-             from :: undefined | jid:jid(),
-             to :: undefined | jid:jid(),
-             sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-	     meta = #{} :: map()}).
+	type :: iq_type(),
+	lang = <<>> :: binary(),
+	from :: undefined | jid:jid(),
+	to :: undefined | jid:jid(),
+	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+	meta = #{} :: map()}).
 -type iq() :: #iq{}.
 
 -record(message, {id = <<>> :: binary(),
-                  type = normal :: message_type(),
-                  lang = <<>> :: binary(),
-                  from :: undefined | jid:jid(),
-                  to :: undefined | jid:jid(),
-                  subject = [] :: [#text{}],
-                  body = [] :: [#text{}],
-                  thread :: undefined | message_thread(),
-                  sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-		  meta = #{} :: map()}).
+	type = normal :: message_type(),
+	lang = <<>> :: binary(),
+	from :: undefined | jid:jid(),
+	to :: undefined | jid:jid(),
+	subject = [] :: [#text{}],
+	body = [] :: [#text{}],
+	thread :: undefined | message_thread(),
+	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+	meta = #{} :: map()}).
 -type message() :: #message{}.
 
 -record(presence, {id = <<>> :: binary(),
-                   type = available :: presence_type(),
-                   lang = <<>> :: binary(),
-                   from :: undefined | jid:jid(),
-                   to :: undefined | jid:jid(),
-                   show :: undefined | 'away' | 'chat' | 'dnd' | 'xa',
-                   status = [] :: [#text{}],
-                   priority :: undefined | integer(),
-                   sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-		   meta = #{} :: map()}).
+	type = available :: presence_type(),
+	lang = <<>> :: binary(),
+	from :: undefined | jid:jid(),
+	to :: undefined | jid:jid(),
+	show :: undefined | 'away' | 'chat' | 'dnd' | 'xa',
+	status = [] :: [#text{}],
+	priority :: undefined | integer(),
+	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+	meta = #{} :: map()}).
 -type presence() :: #presence{}.
 
 -record(ps_affiliation, {xmlns = <<>> :: binary(),
-			 node = <<>> :: binary(),
-			 type :: member | none | outcast |
-				 owner | publisher | publish_only,
-			 jid :: undefined | jid:jid()}).
+	node = <<>> :: binary(),
+	type :: member | none | outcast |
+	owner | publisher | publish_only,
+	jid :: undefined | jid:jid()}).
 -type ps_affiliation() :: #ps_affiliation{}.
 
 -type ps_error_type() :: 'closed-node' | 'configuration-required' |
-			 'invalid-jid' | 'invalid-options' |
-			 'invalid-payload' | 'invalid-subid' |
-			 'item-forbidden' | 'item-required' | 'jid-required' |
-			 'max-items-exceeded' | 'max-nodes-exceeded' |
-			 'nodeid-required' | 'not-in-roster-group' |
-			 'not-subscribed' | 'payload-too-big' |
-			 'payload-required' | 'pending-subscription' |
-			 'precondition-not-met' |
-			 'presence-subscription-required' | 'subid-required' |
-			 'too-many-subscriptions' | 'unsupported' |
-			 'unsupported-access-model'.
+'invalid-jid' | 'invalid-options' |
+'invalid-payload' | 'invalid-subid' |
+'item-forbidden' | 'item-required' | 'jid-required' |
+'max-items-exceeded' | 'max-nodes-exceeded' |
+'nodeid-required' | 'not-in-roster-group' |
+'not-subscribed' | 'payload-too-big' |
+'payload-required' | 'pending-subscription' |
+'precondition-not-met' |
+'presence-subscription-required' | 'subid-required' |
+'too-many-subscriptions' | 'unsupported' |
+'unsupported-access-model'.
 -type ps_feature() :: 'access-authorize' | 'access-open' |
-		      'access-presence' | 'access-roster' |
-		      'access-whitelist' | 'auto-create' |
-		      'auto-subscribe' | 'collections' | 'config-node' |
-		      'create-and-configure' | 'create-nodes' |
-		      'delete-items' | 'delete-nodes' |
-		      'filtered-notifications' | 'get-pending' |
-		      'instant-nodes' | 'item-ids' | 'last-published' |
-		      'leased-subscription' | 'manage-subscriptions' |
-		      'member-affiliation' | 'meta-data' |
-		      'modify-affiliations' | 'multi-collection' |
-		      'multi-subscribe' | 'outcast-affiliation' |
-		      'persistent-items' | 'presence-notifications' |
-		      'presence-subscribe' | 'publish' |
-		      'publish-options' | 'publish-only-affiliation' |
-		      'publisher-affiliation' | 'purge-nodes' |
-		      'retract-items' | 'retrieve-affiliations' |
-		      'retrieve-default' | 'retrieve-items' |
-		      'retrieve-subscriptions' | 'subscribe' |
-		      'subscription-options' | 'subscription-notifications' |
-		      'multi-items' | undefined.
+'access-presence' | 'access-roster' |
+'access-whitelist' | 'auto-create' |
+'auto-subscribe' | 'collections' | 'config-node' |
+'create-and-configure' | 'create-nodes' |
+'delete-items' | 'delete-nodes' |
+'filtered-notifications' | 'get-pending' |
+'instant-nodes' | 'item-ids' | 'last-published' |
+'leased-subscription' | 'manage-subscriptions' |
+'member-affiliation' | 'meta-data' |
+'modify-affiliations' | 'multi-collection' |
+'multi-subscribe' | 'outcast-affiliation' |
+'persistent-items' | 'presence-notifications' |
+'presence-subscribe' | 'publish' |
+'publish-options' | 'publish-only-affiliation' |
+'publisher-affiliation' | 'purge-nodes' |
+'retract-items' | 'retrieve-affiliations' |
+'retrieve-default' | 'retrieve-items' |
+'retrieve-subscriptions' | 'subscribe' |
+'subscription-options' | 'subscription-notifications' |
+'multi-items' | undefined.
 -record(ps_error, {type :: ps_error_type(), feature :: ps_feature()}).
 -type ps_error() :: #ps_error{}.
 
@@ -94,19 +94,19 @@
 -type csi() :: #csi{}.
 
 -record(hint, {type :: 'no-copy' | 'no-store' | 'no-storage' | 'store' |
-		       'no-permanent-store' | 'no-permanent-storage'}).
+'no-permanent-store' | 'no-permanent-storage'}).
 -type hint() :: #hint{}.
 
 -record(jingle_error, {reason :: 'out-of-order' | 'tie-break' |
-				 'unknown-session' | 'unsupported-info' |
-				 'security-required'}).
+'unknown-session' | 'unsupported-info' |
+'security-required'}).
 -type jingle_error() :: #jingle_error{}.
 
 -record(jingle_ft_error, {reason :: 'file-not-available' | 'file-too-large'}).
 -type jingle_ft_error() :: #jingle_ft_error{}.
 
 -type xmpp_host() :: binary() | inet:ip_address() |
-		     {binary() | inet:ip_address(), inet:port_number()}.
+{binary() | inet:ip_address(), inet:port_number()}.
 
 -record(avatar_data, {data = <<>> :: binary()}).
 -type avatar_data() :: #avatar_data{}.
@@ -209,6 +209,10 @@
                 desc = <<>> :: binary()}).
 -type delay() :: #delay{}.
 
+-record(message_upload_body, {url = <<>> :: binary(),
+                              title = <<>> :: binary()}).
+-type message_upload_body() :: #message_upload_body{}.
+
 -record(muc_history, {maxchars :: 'undefined' | non_neg_integer(),
                       maxstanzas :: 'undefined' | non_neg_integer(),
                       seconds :: 'undefined' | non_neg_integer(),
@@ -229,6 +233,9 @@
                    'block-size' :: non_neg_integer(),
                    stanza = iq :: 'iq' | 'message'}).
 -type ibb_open() :: #ibb_open{}.
+
+-record(payload_json, {data = <<>> :: binary()}).
+-type payload_json() :: #payload_json{}.
 
 -record(muc_decline, {reason = <<>> :: binary(),
                       from :: undefined | jid:jid(),
@@ -314,6 +321,13 @@
                          data = <<>> :: binary()}).
 -type message_thread() :: #message_thread{}.
 
+-record(message_payload, {datatype = <<>> :: binary(),
+                          json :: 'undefined' | #payload_json{}}).
+-type message_payload() :: #message_payload{}.
+
+-record(message_upload, {body = [] :: [#message_upload_body{}]}).
+-type message_upload() :: #message_upload{}.
+
 -record(jingle_content, {creator :: 'initiator' | 'responder',
                          disposition = <<>> :: binary(),
                          name = <<>> :: binary(),
@@ -378,6 +392,11 @@
                     sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type db_verify() :: #db_verify{}.
 
+-record(message_entity, {type :: atom(),
+                         offset = 0 :: non_neg_integer(),
+                         length = 0 :: non_neg_integer()}).
+-type message_entity() :: #message_entity{}.
+
 -record(nick, {name = <<>> :: binary()}).
 -type nick() :: #nick{}.
 
@@ -423,6 +442,9 @@
 -record(addresses, {list = [] :: [#address{}]}).
 -type addresses() :: #addresses{}.
 
+-record(message_entities, {items = [] :: [#message_entity{}]}).
+-type message_entities() :: #message_entities{}.
+
 -record(starttls, {required = false :: boolean()}).
 -type starttls() :: #starttls{}.
 
@@ -440,6 +462,12 @@
 -record(sasl2_abort, {text :: 'undefined' | binary(),
                       sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type sasl2_abort() :: #sasl2_abort{}.
+
+-record(bot, {nick = <<>> :: binary(),
+              type = system :: 'system' | binary(),
+              hash = <<>> :: binary(),
+              parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
 
 -record('see-other-host', {host :: binary() | inet:ip_address() | {binary() | inet:ip_address(),inet:port_number()}}).
 -type 'see-other-host'() :: #'see-other-host'{}.
@@ -504,6 +532,9 @@
                       signature :: binary()}).
 -type x509_revoke() :: #x509_revoke{}.
 
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
+
 -record(sasl_auth, {mechanism = <<>> :: binary(),
                     text = <<>> :: binary()}).
 -type sasl_auth() :: #sasl_auth{}.
@@ -513,6 +544,14 @@
 
 -record(feature_csi, {}).
 -type feature_csi() :: #feature_csi{}.
+
+-record(feature_fallback_body, {start :: non_neg_integer(),
+                                'end' :: non_neg_integer()}).
+-type feature_fallback_body() :: #feature_fallback_body{}.
+
+-record(feature_fallback, {for = <<>> :: binary(),
+                           body :: 'undefined' | #feature_fallback_body{}}).
+-type feature_fallback() :: #feature_fallback{}.
 
 -record(report, {reason :: 'abuse' | 'spam' | 'undefined',
                  text = [] :: [#text{}]}).
@@ -961,6 +1000,10 @@
                     cred :: 'undefined' | binary()}).
 -type vcard_key() :: #vcard_key{}.
 
+-record(reply, {id = <<>> :: binary(),
+                to :: jid:jid()}).
+-type reply() :: #reply{}.
+
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
 -type inbox_query() :: #inbox_query{}.
 
@@ -1368,6 +1411,7 @@
                         bookmark_conference() |
                         bookmark_storage() |
                         bookmark_url() |
+                        bot() |
                         bytestreams() |
                         caps() |
                         carbons_disable() |
@@ -1396,6 +1440,8 @@
                         fasten_apply_to() |
                         fasten_external() |
                         feature_csi() |
+                        feature_fallback() |
+                        feature_fallback_body() |
                         feature_register() |
                         feature_sm() |
                         forwarded() |
@@ -1442,11 +1488,16 @@
                         media() |
                         media_uri() |
                         message() |
+                        message_entities() |
+                        message_entity() |
                         message_moderate() |
                         message_moderated() |
+                        message_payload() |
                         message_retract() |
                         message_retracted() |
                         message_thread() |
+                        message_upload() |
+                        message_upload_body() |
                         mix() |
                         mix_client_join() |
                         mix_client_leave() |
@@ -1482,6 +1533,7 @@
                         offline_item() |
                         oob_x() |
                         origin_id() |
+                        payload_json() |
                         pep_bookmarks_conference() |
                         ping() |
                         presence() |
@@ -1511,6 +1563,8 @@
                         receipt_response() |
                         redirect() |
                         register() |
+                        replace() |
+                        reply() |
                         report() |
                         roster_item() |
                         roster_query() |
