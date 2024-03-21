@@ -7,16 +7,14 @@
 -type property() :: {'with', jid:jid()} |
                     {'start', erlang:timestamp()} |
                     {'end', erlang:timestamp()} |
-                    {'withtext', binary()} |
-                    {'with_nick', binary()}.
+                    {'withtext', binary()}.
 -type result() :: [property()].
 
 -type form_property() ::
       {'with', jid:jid() | undefined} |
       {'start', erlang:timestamp() | undefined} |
       {'end', erlang:timestamp() | undefined} |
-      {'withtext', binary()} |
-      {'with_nick', binary()}.
+      {'withtext', binary()}.
 -type form() :: [form_property() | xdata_field()].
 
 -type error_reason() :: {form_type_mismatch, binary()} |
