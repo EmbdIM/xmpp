@@ -159,11 +159,11 @@ decode_message_moderated_els(__TopXMLNS, __Opts,
                              _attrs,
                              __TopXMLNS)
         of
-        <<"urn:xmpp:message-retract:1">> ->
+        <<"urn:xmpp:message-retract:0">> ->
             decode_message_moderated_els(__TopXMLNS,
                                          __Opts,
                                          _els,
-                                         xep0424:decode_message_retract(<<"urn:xmpp:message-retract:1">>,
+                                         xep0424:decode_message_retract(<<"urn:xmpp:message-retract:0">>,
                                                                         __Opts,
                                                                         _el),
                                          Reason,
@@ -341,11 +341,11 @@ decode_message_moderate_els(__TopXMLNS, __Opts,
                              _attrs,
                              __TopXMLNS)
         of
-        <<"urn:xmpp:message-retract:1">> ->
+        <<"urn:xmpp:message-retract:0">> ->
             decode_message_moderate_els(__TopXMLNS,
                                         __Opts,
                                         _els,
-                                        xep0424:decode_message_retract(<<"urn:xmpp:message-retract:1">>,
+                                        xep0424:decode_message_retract(<<"urn:xmpp:message-retract:0">>,
                                                                        __Opts,
                                                                        _el),
                                         Reason);
