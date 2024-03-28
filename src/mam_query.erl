@@ -67,7 +67,11 @@
 -spec encode(form(), binary()) -> [xdata_field()].
 
 -spec encode(form(), binary(),
-             [with | start | 'end' | withtext]) -> [xdata_field()].
+             [with |
+              start |
+              'end' |
+              withtext |
+              with_nick]) -> [xdata_field()].
 
 dec_int(Val) -> dec_int(Val, infinity, infinity).
 
@@ -197,6 +201,10 @@ encode(List, Lang, Required) ->
                   [encode_withtext(Val,
                                    Lang,
                                    lists:member(withtext, Required))];
+              {with_nick, Val} ->
+                  [encode_with_nick(Val,
+                                    Lang,
+                                    lists:member(with_nick, Required))];
               #xdata_field{} -> [Opt]
           end
           || Opt <- List],
@@ -322,6 +330,36 @@ do_decode([#xdata_field{var = <<"withtext">>} | _],
           XMLNS, _, _) ->
     erlang:error({?MODULE,
                   {too_many_values, <<"withtext">>, XMLNS}});
+do_decode([#xdata_field{var = <<"with_nick">>,
+                        values = [Value]}
+           | Fs],
+          XMLNS, Required, Acc) ->
+    try Value of
+        Result ->
+            do_decode(Fs,
+                      XMLNS,
+                      lists:delete(<<"with_nick">>, Required),
+                      [{with_nick, Result} | Acc])
+    catch
+        _:_ ->
+            erlang:error({?MODULE,
+                          {bad_var_value, <<"with_nick">>, XMLNS}})
+    end;
+do_decode([#xdata_field{var = <<"with_nick">>,
+                        values = []} =
+               F
+           | Fs],
+          XMLNS, Required, Acc) ->
+    do_decode([F#xdata_field{var = <<"with_nick">>,
+                             values = [<<>>]}
+               | Fs],
+              XMLNS,
+              Required,
+              Acc);
+do_decode([#xdata_field{var = <<"with_nick">>} | _],
+          XMLNS, _, _) ->
+    erlang:error({?MODULE,
+                  {too_many_values, <<"with_nick">>, XMLNS}});
 do_decode([#xdata_field{var = Var} | Fs], XMLNS,
           Required, Acc) ->
     if Var /= <<"FORM_TYPE">> ->
@@ -388,3 +426,17 @@ encode_withtext(Value, Lang, IsRequired) ->
                  required = IsRequired, type = 'text-single',
                  options = Opts, desc = <<>>,
                  label = xmpp_tr:tr(Lang, ?T("Search the text"))}.
+
+-spec encode_with_nick(binary(), binary(),
+                       boolean()) -> xdata_field().
+
+encode_with_nick(Value, Lang, IsRequired) ->
+    Values = case Value of
+                 <<>> -> [];
+                 Value -> [Value]
+             end,
+    Opts = [],
+    #xdata_field{var = <<"with_nick">>, values = Values,
+                 required = IsRequired, type = 'text-single',
+                 options = Opts, desc = <<>>,
+                 label = xmpp_tr:tr(Lang, ?T("Search by nick"))}.
