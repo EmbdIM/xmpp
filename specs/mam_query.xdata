@@ -15,8 +15,11 @@
 	 type='text-single'
 	 label='Search the text'/>
   <field var='with_nick'
-           type='text-single'
-           label='Search by nick'/>
+     type='text-single'
+     label='Search by nick'/>
+  <field var='with_xml'
+     type='text-single'
+     label='Search by xml'/>
 </form_type>
 
 <!--
