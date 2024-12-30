@@ -162,6 +162,23 @@ unsubscribed.
 -record(carbons_enable, {}).
 -type carbons_enable() :: #carbons_enable{}.
 
+-record(scram_upgrade_salt, {iterations :: pos_integer(),
+                             cdata = <<>> :: binary()}).
+-type scram_upgrade_salt() :: #scram_upgrade_salt{}.
+
+
+-record(scram_upgrade_hash, {data = <<>> :: binary()}).
+-type scram_upgrade_hash() :: #scram_upgrade_hash{}.
+
+-record(bind2_bound, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type bind2_bound() :: #bind2_bound{}.
+
+-record(s2s_bidi_feature, {}).
+-type s2s_bidi_feature() :: #s2s_bidi_feature{}.
+
+-record(s2s_bidi, {}).
+-type s2s_bidi() :: #s2s_bidi{}.
+
 -record(mix_create, {channel = <<>> :: binary(),
                      xmlns = <<>> :: binary()}).
 -type mix_create() :: #mix_create{}.
@@ -225,8 +242,14 @@ unsubscribed.
                     height :: 'undefined' | non_neg_integer()}).
 -type thumbnail() :: #thumbnail{}.
 
--record(privilege_perm, {access :: 'message' | 'presence' | 'roster',
-                         type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set'}).
+-record(privilege_namespace, {ns = <<>> :: binary(),
+                              type :: 'both' | 'get' | 'none' | 'set'}).
+-type privilege_namespace() :: #privilege_namespace{}.
+
+-record(privilege_perm, {access :: 'iq' | 'message' | 'presence' | 'roster',
+                         type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set' | 'undefined',
+                         push = true :: boolean(),
+                         namespaces = [] :: [#privilege_namespace{}]}).
 -type privilege_perm() :: #privilege_perm{}.
 
 -record(ibb_open, {sid = <<>> :: binary(),
@@ -293,6 +316,20 @@ unsubscribed.
                        db_xmlns = <<>> :: binary(),
                        lang = <<>> :: binary()}).
 -type stream_start() :: #stream_start{}.
+
+-record(fast, {zero_rtt :: 'false' | 'true' | 'undefined',
+               count :: 'undefined' | integer(),
+               invalidate :: 'false' | 'true' | 'undefined',
+               mechs = [] :: [binary()]}).
+-type fast() :: #fast{}.
+
+-record(fast_token, {expiry :: undefined | erlang:timestamp(),
+                     token = <<>> :: binary()}).
+-type fast_token() :: #fast_token{}.
+
+-record(fast_request_token, {mech = <<>> :: binary()}).
+-type fast_request_token() :: #fast_request_token{}.
+
 
 -record(muc_subscribe, {nick = <<>> :: binary(),
                         password = <<>> :: binary(),
@@ -371,6 +408,10 @@ unsubscribed.
 -record(sasl_channel_binding, {bindings = [] :: [binary()]}).
 -type sasl_channel_binding() :: #sasl_channel_binding{}.
 
+-record(sasl_upgrade, {cdata = <<>> :: binary()}).
+-type sasl_upgrade() :: #sasl_upgrade{}.
+
+
 -record(hash, {algo = <<>> :: binary(),
                data = <<>> :: binary()}).
 -type hash() :: #hash{}.
@@ -413,6 +454,10 @@ unsubscribed.
 -record(ps_publish, {node = <<>> :: binary(),
                      items = [] :: [#ps_item{}]}).
 -type ps_publish() :: #ps_publish{}.
+
+-record(sasl2_task_data, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_task_data() :: #sasl2_task_data{}.
+
 
 -record(avatar_pointer, {bytes :: 'undefined' | non_neg_integer(),
                          id = <<>> :: binary(),
@@ -682,9 +727,6 @@ unsubscribed.
               port :: 'undefined' | non_neg_integer(),
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
-
--record(bind2_bound, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type bind2_bound() :: #bind2_bound{}.
 
 -record(message_moderated, {by :: undefined | jid:jid(),
                             reason :: 'undefined' | binary(),
@@ -1236,6 +1278,10 @@ unsubscribed.
                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type register() :: #register{}.
 
+-record(privileged_iq, {iq :: 'undefined' | #iq{}}).
+-type privileged_iq() :: #privileged_iq{}.
+
+
 -record(disco_info, {node = <<>> :: binary(),
                      identities = [] :: [#identity{}],
                      features = [] :: [binary()],
@@ -1437,6 +1483,9 @@ unsubscribed.
                         disco_item() |
                         disco_items() |
                         expire() |
+                        fast() |
+                        fast_request_token() |
+                        fast_token() |
                         fasten_apply_to() |
                         fasten_external() |
                         feature_csi() |
@@ -1542,7 +1591,9 @@ unsubscribed.
                         privacy_query() |
                         private() |
                         privilege() |
+                        privilege_namespace() |
                         privilege_perm() |
+                        privileged_iq() |
                         ps_affiliation() |
                         ps_error() |
                         ps_event() |
@@ -1571,6 +1622,8 @@ unsubscribed.
                         rosterver_feature() |
                         rsm_first() |
                         rsm_set() |
+                        s2s_bidi() |
+                        s2s_bidi_feature() |
                         sasl2_abort() |
                         sasl2_authenticate() |
                         sasl2_authenticaton() |
@@ -1579,6 +1632,7 @@ unsubscribed.
                         sasl2_failure() |
                         sasl2_response() |
                         sasl2_success() |
+                        sasl2_task_data() |
                         sasl2_user_agent() |
                         sasl_abort() |
                         sasl_auth() |
@@ -1588,6 +1642,9 @@ unsubscribed.
                         sasl_mechanisms() |
                         sasl_response() |
                         sasl_success() |
+                        sasl_upgrade() |
+                        scram_upgrade_hash() |
+                        scram_upgrade_salt() |
                         search() |
                         search_item() |
                         'see-other-host'() |
