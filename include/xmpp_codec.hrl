@@ -2,88 +2,88 @@
 %% Source: xmpp_codec.spec
 
 -record(text, {lang = <<>> :: binary(),
-	data = <<>> :: binary()}).
+               data = <<>> :: binary()}).
 -type text() :: #text{}.
 
 -type iq_type() :: get | set | result | error.
 -type message_type() :: chat | error | groupchat | headline | normal.
 -type presence_type() :: available | error | probe | subscribe |
-subscribed | unavailable | unsubscribe |
-unsubscribed.
+			 subscribed | unavailable | unsubscribe |
+			 unsubscribed.
 
 -record(iq, {id = <<>> :: binary(),
-	type :: iq_type(),
-	lang = <<>> :: binary(),
-	from :: undefined | jid:jid(),
-	to :: undefined | jid:jid(),
-	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-	meta = #{} :: map()}).
+             type :: iq_type(),
+             lang = <<>> :: binary(),
+             from :: undefined | jid:jid(),
+             to :: undefined | jid:jid(),
+             sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+	     meta = #{} :: map()}).
 -type iq() :: #iq{}.
 
 -record(message, {id = <<>> :: binary(),
-	type = normal :: message_type(),
-	lang = <<>> :: binary(),
-	from :: undefined | jid:jid(),
-	to :: undefined | jid:jid(),
-	subject = [] :: [#text{}],
-	body = [] :: [#text{}],
-	thread :: undefined | message_thread(),
-	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-	meta = #{} :: map()}).
+                  type = normal :: message_type(),
+                  lang = <<>> :: binary(),
+                  from :: undefined | jid:jid(),
+                  to :: undefined | jid:jid(),
+                  subject = [] :: [#text{}],
+                  body = [] :: [#text{}],
+                  thread :: undefined | message_thread(),
+                  sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+		  meta = #{} :: map()}).
 -type message() :: #message{}.
 
 -record(presence, {id = <<>> :: binary(),
-	type = available :: presence_type(),
-	lang = <<>> :: binary(),
-	from :: undefined | jid:jid(),
-	to :: undefined | jid:jid(),
-	show :: undefined | 'away' | 'chat' | 'dnd' | 'xa',
-	status = [] :: [#text{}],
-	priority :: undefined | integer(),
-	sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-	meta = #{} :: map()}).
+                   type = available :: presence_type(),
+                   lang = <<>> :: binary(),
+                   from :: undefined | jid:jid(),
+                   to :: undefined | jid:jid(),
+                   show :: undefined | 'away' | 'chat' | 'dnd' | 'xa',
+                   status = [] :: [#text{}],
+                   priority :: undefined | integer(),
+                   sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+		   meta = #{} :: map()}).
 -type presence() :: #presence{}.
 
 -record(ps_affiliation, {xmlns = <<>> :: binary(),
-	node = <<>> :: binary(),
-	type :: member | none | outcast |
-	owner | publisher | publish_only,
-	jid :: undefined | jid:jid()}).
+			 node = <<>> :: binary(),
+			 type :: member | none | outcast |
+				 owner | publisher | publish_only,
+			 jid :: undefined | jid:jid()}).
 -type ps_affiliation() :: #ps_affiliation{}.
 
 -type ps_error_type() :: 'closed-node' | 'configuration-required' |
-'invalid-jid' | 'invalid-options' |
-'invalid-payload' | 'invalid-subid' |
-'item-forbidden' | 'item-required' | 'jid-required' |
-'max-items-exceeded' | 'max-nodes-exceeded' |
-'nodeid-required' | 'not-in-roster-group' |
-'not-subscribed' | 'payload-too-big' |
-'payload-required' | 'pending-subscription' |
-'precondition-not-met' |
-'presence-subscription-required' | 'subid-required' |
-'too-many-subscriptions' | 'unsupported' |
-'unsupported-access-model'.
+			 'invalid-jid' | 'invalid-options' |
+			 'invalid-payload' | 'invalid-subid' |
+			 'item-forbidden' | 'item-required' | 'jid-required' |
+			 'max-items-exceeded' | 'max-nodes-exceeded' |
+			 'nodeid-required' | 'not-in-roster-group' |
+			 'not-subscribed' | 'payload-too-big' |
+			 'payload-required' | 'pending-subscription' |
+			 'precondition-not-met' |
+			 'presence-subscription-required' | 'subid-required' |
+			 'too-many-subscriptions' | 'unsupported' |
+			 'unsupported-access-model'.
 -type ps_feature() :: 'access-authorize' | 'access-open' |
-'access-presence' | 'access-roster' |
-'access-whitelist' | 'auto-create' |
-'auto-subscribe' | 'collections' | 'config-node' |
-'create-and-configure' | 'create-nodes' |
-'delete-items' | 'delete-nodes' |
-'filtered-notifications' | 'get-pending' |
-'instant-nodes' | 'item-ids' | 'last-published' |
-'leased-subscription' | 'manage-subscriptions' |
-'member-affiliation' | 'meta-data' |
-'modify-affiliations' | 'multi-collection' |
-'multi-subscribe' | 'outcast-affiliation' |
-'persistent-items' | 'presence-notifications' |
-'presence-subscribe' | 'publish' |
-'publish-options' | 'publish-only-affiliation' |
-'publisher-affiliation' | 'purge-nodes' |
-'retract-items' | 'retrieve-affiliations' |
-'retrieve-default' | 'retrieve-items' |
-'retrieve-subscriptions' | 'subscribe' |
-'subscription-options' | 'subscription-notifications' |
-'multi-items' | undefined.
+		      'access-presence' | 'access-roster' |
+		      'access-whitelist' | 'auto-create' |
+		      'auto-subscribe' | 'collections' | 'config-node' |
+		      'create-and-configure' | 'create-nodes' |
+		      'delete-items' | 'delete-nodes' |
+		      'filtered-notifications' | 'get-pending' |
+		      'instant-nodes' | 'item-ids' | 'last-published' |
+		      'leased-subscription' | 'manage-subscriptions' |
+		      'member-affiliation' | 'meta-data' |
+		      'modify-affiliations' | 'multi-collection' |
+		      'multi-subscribe' | 'outcast-affiliation' |
+		      'persistent-items' | 'presence-notifications' |
+		      'presence-subscribe' | 'publish' |
+		      'publish-options' | 'publish-only-affiliation' |
+		      'publisher-affiliation' | 'purge-nodes' |
+		      'retract-items' | 'retrieve-affiliations' |
+		      'retrieve-default' | 'retrieve-items' |
+		      'retrieve-subscriptions' | 'subscribe' |
+		      'subscription-options' | 'subscription-notifications' |
+		      'multi-items' | undefined.
 -record(ps_error, {type :: ps_error_type(), feature :: ps_feature()}).
 -type ps_error() :: #ps_error{}.
 
@@ -94,19 +94,19 @@ unsubscribed.
 -type csi() :: #csi{}.
 
 -record(hint, {type :: 'no-copy' | 'no-store' | 'no-storage' | 'store' |
-'no-permanent-store' | 'no-permanent-storage'}).
+		       'no-permanent-store' | 'no-permanent-storage'}).
 -type hint() :: #hint{}.
 
 -record(jingle_error, {reason :: 'out-of-order' | 'tie-break' |
-'unknown-session' | 'unsupported-info' |
-'security-required'}).
+				 'unknown-session' | 'unsupported-info' |
+				 'security-required'}).
 -type jingle_error() :: #jingle_error{}.
 
 -record(jingle_ft_error, {reason :: 'file-not-available' | 'file-too-large'}).
 -type jingle_ft_error() :: #jingle_ft_error{}.
 
 -type xmpp_host() :: binary() | inet:ip_address() |
-{binary() | inet:ip_address(), inet:port_number()}.
+		     {binary() | inet:ip_address(), inet:port_number()}.
 
 -record(avatar_data, {data = <<>> :: binary()}).
 -type avatar_data() :: #avatar_data{}.
@@ -162,22 +162,10 @@ unsubscribed.
 -record(carbons_enable, {}).
 -type carbons_enable() :: #carbons_enable{}.
 
--record(scram_upgrade_salt, {iterations :: pos_integer(),
-                             cdata = <<>> :: binary()}).
--type scram_upgrade_salt() :: #scram_upgrade_salt{}.
-
-
--record(scram_upgrade_hash, {data = <<>> :: binary()}).
--type scram_upgrade_hash() :: #scram_upgrade_hash{}.
-
--record(bind2_bound, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type bind2_bound() :: #bind2_bound{}.
-
 -record(s2s_bidi_feature, {}).
 -type s2s_bidi_feature() :: #s2s_bidi_feature{}.
 
--record(s2s_bidi, {}).
--type s2s_bidi() :: #s2s_bidi{}.
+
 
 -record(mix_create, {channel = <<>> :: binary(),
                      xmlns = <<>> :: binary()}).
@@ -185,6 +173,17 @@ unsubscribed.
 
 -record(sasl2_response, {text = <<>> :: binary()}).
 -type sasl2_response() :: #sasl2_response{}.
+
+-record(sasl2_next, {task = <<>> :: binary(),
+  sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_next() :: #sasl2_next{}.
+
+-record(scram_upgrade_salt, {iterations :: pos_integer(),
+  cdata = <<>> :: binary()}).
+-type scram_upgrade_salt() :: #scram_upgrade_salt{}.
+
+-record(scram_upgrade_hash, {data = <<>> :: binary()}).
+-type scram_upgrade_hash() :: #scram_upgrade_hash{}.
 
 -record(receipt_response, {id = <<>> :: binary()}).
 -type receipt_response() :: #receipt_response{}.
@@ -226,6 +225,9 @@ unsubscribed.
                 desc = <<>> :: binary()}).
 -type delay() :: #delay{}.
 
+-record(s2s_bidi, {}).
+-type s2s_bidi() :: #s2s_bidi{}.
+
 -record(message_upload_body, {url = <<>> :: binary(),
                               title = <<>> :: binary()}).
 -type message_upload_body() :: #message_upload_body{}.
@@ -243,13 +245,14 @@ unsubscribed.
 -type thumbnail() :: #thumbnail{}.
 
 -record(privilege_namespace, {ns = <<>> :: binary(),
-                              type :: 'both' | 'get' | 'none' | 'set'}).
+  type :: 'both' | 'get' | 'none' | 'set'}).
 -type privilege_namespace() :: #privilege_namespace{}.
 
+
 -record(privilege_perm, {access :: 'iq' | 'message' | 'presence' | 'roster',
-                         type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set' | 'undefined',
-                         push = true :: boolean(),
-                         namespaces = [] :: [#privilege_namespace{}]}).
+  type :: 'both' | 'get' | 'managed_entity' | 'none' | 'outgoing' | 'roster' | 'set' | 'undefined',
+  push = true :: boolean(),
+  namespaces = [] :: [#privilege_namespace{}]}).
 -type privilege_perm() :: #privilege_perm{}.
 
 -record(ibb_open, {sid = <<>> :: binary(),
@@ -318,18 +321,17 @@ unsubscribed.
 -type stream_start() :: #stream_start{}.
 
 -record(fast, {zero_rtt :: 'false' | 'true' | 'undefined',
-               count :: 'undefined' | integer(),
-               invalidate :: 'false' | 'true' | 'undefined',
-               mechs = [] :: [binary()]}).
+  count :: 'undefined' | integer(),
+  invalidate :: 'false' | 'true' | 'undefined',
+  mechs = [] :: [binary()]}).
 -type fast() :: #fast{}.
 
 -record(fast_token, {expiry :: undefined | erlang:timestamp(),
-                     token = <<>> :: binary()}).
+  token = <<>> :: binary()}).
 -type fast_token() :: #fast_token{}.
 
 -record(fast_request_token, {mech = <<>> :: binary()}).
 -type fast_request_token() :: #fast_request_token{}.
-
 
 -record(muc_subscribe, {nick = <<>> :: binary(),
                         password = <<>> :: binary(),
@@ -353,6 +355,10 @@ unsubscribed.
 -record(privilege, {perms = [] :: [#privilege_perm{}],
                     forwarded :: 'undefined' | #forwarded{}}).
 -type privilege() :: #privilege{}.
+
+-record(privileged_iq, {iq :: 'undefined' | #iq{}}).
+-type privileged_iq() :: #privileged_iq{}.
+
 
 -record(message_thread, {parent = <<>> :: binary(),
                          data = <<>> :: binary()}).
@@ -408,10 +414,6 @@ unsubscribed.
 -record(sasl_channel_binding, {bindings = [] :: [binary()]}).
 -type sasl_channel_binding() :: #sasl_channel_binding{}.
 
--record(sasl_upgrade, {cdata = <<>> :: binary()}).
--type sasl_upgrade() :: #sasl_upgrade{}.
-
-
 -record(hash, {algo = <<>> :: binary(),
                data = <<>> :: binary()}).
 -type hash() :: #hash{}.
@@ -454,10 +456,6 @@ unsubscribed.
 -record(ps_publish, {node = <<>> :: binary(),
                      items = [] :: [#ps_item{}]}).
 -type ps_publish() :: #ps_publish{}.
-
--record(sasl2_task_data, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
--type sasl2_task_data() :: #sasl2_task_data{}.
-
 
 -record(avatar_pointer, {bytes :: 'undefined' | non_neg_integer(),
                          id = <<>> :: binary(),
@@ -507,6 +505,9 @@ unsubscribed.
 -record(sasl2_abort, {text :: 'undefined' | binary(),
                       sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type sasl2_abort() :: #sasl2_abort{}.
+
+-record(sasl2_task_data, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type sasl2_task_data() :: #sasl2_task_data{}.
 
 -record(bot, {nick = <<>> :: binary(),
               type = system :: 'system' | binary(),
@@ -560,6 +561,9 @@ unsubscribed.
 
 -record(sasl_response, {text = <<>> :: binary()}).
 -type sasl_response() :: #sasl_response{}.
+
+-record(sasl_upgrade, {cdata = <<>> :: binary()}).
+-type sasl_upgrade() :: #sasl_upgrade{}.
 
 -record(sasl2_continue, {additional_data :: 'undefined' | binary(),
                          text :: 'undefined' | binary(),
@@ -727,6 +731,9 @@ unsubscribed.
               port :: 'undefined' | non_neg_integer(),
               xmlns = <<>> :: binary()}).
 -type sic() :: #sic{}.
+
+-record(bind2_bound, {sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
+-type bind2_bound() :: #bind2_bound{}.
 
 -record(message_moderated, {by :: undefined | jid:jid(),
                             reason :: 'undefined' | binary(),
@@ -1278,10 +1285,6 @@ unsubscribed.
                    sub_els = [] :: [xmpp_element() | fxml:xmlel()]}).
 -type register() :: #register{}.
 
--record(privileged_iq, {iq :: 'undefined' | #iq{}}).
--type privileged_iq() :: #privileged_iq{}.
-
-
 -record(disco_info, {node = <<>> :: binary(),
                      identities = [] :: [#identity{}],
                      features = [] :: [binary()],
@@ -1630,6 +1633,7 @@ unsubscribed.
                         sasl2_challenge() |
                         sasl2_continue() |
                         sasl2_failure() |
+                        sasl2_next() |
                         sasl2_response() |
                         sasl2_success() |
                         sasl2_task_data() |
