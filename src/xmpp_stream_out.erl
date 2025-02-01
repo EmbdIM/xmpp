@@ -1402,20 +1402,27 @@ h_addr_list_to_host_ports(AddrList) ->
 				       {error, {tls, tls_error_reason()}}.
 connect(AddrPorts, State) ->
     case connect(AddrPorts, State, {error, nxdomain}) of
-	{ok, Socket, {Addr, Port, TLS = true}} ->
-	    case starttls(Socket, State) of
-		{ok, TLSSocket} -> {ok, TLSSocket, {Addr, Port, TLS}};
-		{error, Why} -> {error, {tls, Why}}
-	    end;
-	{ok, Socket, {Addr, Port, TLS = false}} ->
-	    {ok, Socket, {Addr, Port, TLS}};
-	{error, Why} ->
-	    {error, {socket, Why}}
+        {ok, Socket, {Addr, Port, TLS = true}, Rest} ->
+            case starttls(Socket, State) of
+                {ok, TLSSocket} ->
+                    case xmpp_socket:finish_tls_handshake(TLSSocket) of
+                        {ok, _TLSSock} ->
+                            {ok, TLSSocket, {Addr, Port, TLS}};
+                        {error, _Why} ->
+                            connect(Rest, State)
+                    end;
+                {error, _Why} ->
+                    connect(Rest, State)
+            end;
+        {ok, Socket, {Addr, Port, TLS = false}, _Rest} ->
+            {ok, Socket, {Addr, Port, TLS}};
+        {error, Why} ->
+            {error, {socket, Why}}
     end.
 
 -ifndef(USE_GETHOSTBYNAME).
 -spec connect([addr_info()], state(), network_error()) ->
-		     {ok, term(), ip_port()} | network_error().
+		     {ok, term(), ip_port(), [addr_info()]} | network_error().
 connect([{#{family := Type, addr := SockAddr}, TLS}|AddressInfos], State, _) ->
     #{addr := Addr, port := Port} = SockAddr,
     Opts = [binary, {packet, 0},
@@ -1428,7 +1435,7 @@ connect([{#{family := Type, addr := SockAddr}, TLS}|AddressInfos], State, _) ->
     Timeout = get_connect_timeout(State),
     try xmpp_socket:connect(SockAddr, Port, Opts1, Timeout) of
 	{ok, Socket} ->
-	    {ok, Socket, {Addr, Port, TLS}};
+	    {ok, Socket, {Addr, Port, TLS}, AddressInfos};
 	Err ->
 	    connect(AddressInfos, State, Err)
     catch _:badarg ->
@@ -1438,7 +1445,7 @@ connect([], _State, Err) ->
     Err.
 -else.
 -spec connect([ip_port()], state(), network_error()) ->
-		     {ok, term(), ip_port()} | network_error().
+		     {ok, term(), ip_port(), [ip_port()]} | network_error().
 connect([{Addr, Port, TLS}|AddrPorts], State, _) ->
     Type = get_addr_type(Addr),
     Opts = [binary, {packet, 0},
@@ -1451,7 +1458,7 @@ connect([{Addr, Port, TLS}|AddrPorts], State, _) ->
     Timeout = get_connect_timeout(State),
     try xmpp_socket:connect(Addr, Port, Opts1, Timeout) of
 	{ok, Socket} ->
-	    {ok, Socket, {Addr, Port, TLS}};
+	    {ok, Socket, {Addr, Port, TLS}, AddrPorts};
 	Err ->
 	    connect(AddrPorts, State, Err)
     catch _:badarg ->

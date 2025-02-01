@@ -1,3 +1,42 @@
+# Version 1.9.1
+
+* Updating fast_xml to version 1.1.55.
+* Make `allow_unencrypted_sasl2` option also allow connection
+  for clients that tell us they wanted to use but didn't find
+  channel bindings
+* Implement XEP-0484 Fast Authentication Streamlining Tokens
+* Improvements to XEP-0480 parsing
+* Improve `make spec` and `make xdata` commands
+
+# Version 1.9.0
+
+* Updating fast_tls to version 1.1.22.
+* Updating fast_xml to version 1.1.53.
+* Add support for XEP-0480 SASL Upgrade Tasks
+* Add support for XEP-0288 Bidirectional Server-to-Server Connections
+* Improve failback handling for S2S connections using direct tls
+* Add option for allowing SASL2 on unencrypted connections
+* Update spec of XEP-0356 Privileged Entity to version 0.4.1
+* Automatic "make spec xdata"
+
+# Version 1.8.3
+
+* Updating fast_tls to version 1.1.21.
+* Improve handling of muc retracions
+* Add support for muc#roominfo_avatarhash field
+
+# Version 1.8.2
+
+* Updating fast_tls to version 1.1.20.
+* Updating fast_xml to version 1.1.52.
+* Updating ezlib to version 1.0.13.
+* Updating stringprep to version 1.0.30.
+* Updating p1_utils to version 1.0.26.
+* Add support for xep-0425 (0.3.0)
+* Fix auth error when using sasl2 with empty id in user-agent
+* Fix crash when using older ejabberd without handle_bind2_inline hook
+* Don't use stable resources when client didn't provide user-agent
+
 # Version 1.8.1
 
 * Updating fast_tls to version 1.1.19.
@@ -74,7 +113,7 @@
 * Change internal representation of markable element
 * Add MUC hats support
 * Generate documentation before publishing to hex
-* 
+*
 
 # Version 1.5.4
 

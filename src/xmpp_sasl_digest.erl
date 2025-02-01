@@ -20,7 +20,7 @@
 -author('alexey@sevcom.net').
 -dialyzer({no_match, [get_local_fqdn/1]}).
 
--export([mech_new/7, mech_step/2, format_error/1]).
+-export([mech_new/6, mech_step/2, format_error/1]).
 %% For tests
 -export([parse/1]).
 
@@ -29,9 +29,10 @@
 -type check_password_fun() :: fun((binary(), binary(), binary(), binary(),
                                    fun((binary()) -> binary())) ->
                                            {boolean(), any()} |
+                                           {false, atom(), binary()} |
                                            false).
 -type error_reason() :: parser_failed | invalid_digest_uri |
-			not_authorized | unexpected_response.
+			not_authorized | unexpected_response | {atom(), binary()}.
 -export_type([error_reason/0]).
 
 -record(state, {step = 1 :: 1 | 3 | 5,
@@ -45,6 +46,8 @@
                 hostfqdn = [] :: [binary()]}).
 
 -spec format_error(error_reason()) -> {atom(), binary()}.
+format_error({Condition, Text}) ->
+    {Condition, Text};
 format_error(parser_failed) ->
     {'not-authorized', <<"Response decoding failed">>};
 format_error(invalid_digest_uri) ->
@@ -54,7 +57,8 @@ format_error(not_authorized) ->
 format_error(unexpected_response) ->
     {'not-authorized', <<"Unexpected response">>}.
 
-mech_new(_Mech, _CB, _Mechs, Host, GetPassword, _CheckPassword, CheckPasswordDigest) ->
+mech_new(_Mech, _CB, _Mechs, _UAId, Host, #{get_password := GetPassword,
+				     check_password_digest := CheckPasswordDigest}) ->
     #state{step = 1, nonce = p1_rand:get_string(),
 	   host = Host, hostfqdn = get_local_fqdn(Host),
 	   get_password = GetPassword,
@@ -101,6 +105,7 @@ mech_step(#state{step = 3, nonce = Nonce} = State,
 					 username = UserName,
 					 authzid = AuthzId}};
 			false -> {error, not_authorized, UserName};
+			{false, Condition, Text} -> {error, {Condition, Text}, UserName};
 			{false, _} -> {error, not_authorized, UserName}
 		      end
 		end
