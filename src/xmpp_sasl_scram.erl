@@ -22,17 +22,17 @@
 -protocol({rfc, 5802}).
 -protocol({xep, 474, '0.3.0'}).
 
--export([mech_new/7, mech_step/2, format_error/1]).
+-export([mech_new/6, mech_step/2, format_error/1]).
 
 -include("scram.hrl").
 
 -type password() :: binary() | #scram{}.
--type get_password_fun() :: fun((binary()) -> {false | password(), module()}).
+-type get_password_fun() :: fun((binary()) -> {false | {false, atom(), binary()} | password(), module()}).
 
 -record(state,
 	{step = 2                :: 2 | 4,
 	 algo = sha              :: sha | sha256 | sha512,
-	 channel_bindings = none :: none | #{atom() => binary()},
+	 channel_bindings = none :: none | not_available | #{atom() => binary()},
 	 ssdp                    :: undefined | binary(),
 	 stored_key = <<"">>     :: binary(),
 	 server_key = <<"">>     :: binary(),
@@ -50,11 +50,13 @@
 			not_authorized | saslprep_failed |
 			parser_failed | bad_attribute |
 			nonce_mismatch | bad_channel_binding |
-                        incompatible_mechs.
+                        incompatible_mechs | {atom(), binary()}.
 
 -export_type([error_reason/0]).
 
 -spec format_error(error_reason()) -> {atom(), binary()}.
+format_error({Condition, Text}) ->
+    {Condition, Text};
 format_error(unsupported_extension) ->
     {'not-authorized', <<"Unsupported extension">>};
 format_error(bad_username) ->
@@ -74,14 +76,18 @@ format_error(bad_channel_binding) ->
 format_error(incompatible_mechs) ->
     {'not-authorized', <<"Incompatible SCRAM methods">>}.
 
-mech_new(Mech, ChannelBindings, Mechs, _Host, GetPassword, _CheckPassword, _CheckPasswordDigest) ->
+mech_new(Mech, ChannelBindings, Mechs, _UAId, _Host, #{get_password := GetPassword}) ->
+    NCB = case ChannelBindings of
+	      #{} -> none;
+	      _ -> ChannelBindings
+	  end,
     {Algo, CB} =
     case Mech of
-	<<"SCRAM-SHA-1">> -> {sha, none};
+	<<"SCRAM-SHA-1">> -> {sha, NCB};
 	<<"SCRAM-SHA-1-PLUS">> -> {sha, ChannelBindings};
-	<<"SCRAM-SHA-256">> -> {sha256, none};
+	<<"SCRAM-SHA-256">> -> {sha256, NCB};
 	<<"SCRAM-SHA-256-PLUS">> -> {sha256, ChannelBindings};
-	<<"SCRAM-SHA-512">> -> {sha512, none};
+	<<"SCRAM-SHA-512">> -> {sha512, NCB};
 	<<"SCRAM-SHA-512-PLUS">> -> {sha512, ChannelBindings}
     end,
     Ssdp = case Mechs of
@@ -91,6 +97,7 @@ mech_new(Mech, ChannelBindings, Mechs, _Host, GetPassword, _CheckPassword, _Chec
 		       lists:join(<<",">>, lists:sort(Mechs)),
 		       case ChannelBindings of
 			   none -> [];
+			   not_available -> [];
 			   _ when map_size(ChannelBindings) == 0 -> [];
 			   _ -> [<<"|">>, lists:join(<<",">>, lists:sort(maps:keys(ChannelBindings)))]
 		       end]))
@@ -121,6 +128,8 @@ mech_step(#state{step = 2, algo = Algo, ssdp = Ssdp} = State, ClientIn) ->
 				       true -> Pass
 				    end,
 			    case Pass of
+				{false, Condition, Text} ->
+				  {error, {Condition, Text}, UserName};
 				false ->
 				  {error, not_authorized, UserName};
 				#scram{hash = Hash } when Algo /= Hash ->
@@ -236,7 +245,7 @@ mech_step(#state{step = 4, algo = Algo} = State, ClientIn) ->
 
 cbind_valid(#state{channel_bindings = #{} = Bindings}, <<"p=", Binding/binary>>) ->
     maps:is_key(Binding, Bindings);
-cbind_valid(#state{channel_bindings = Bindings}, _) when Bindings /= none ->
+cbind_valid(#state{channel_bindings = #{}}, _) ->
     false;
 cbind_valid(_, <<"y", _/binary>>) ->
     true;
@@ -251,15 +260,17 @@ extensions_valid(_State, Ext) ->
 	   (_) -> true
 	end, Ext).
 
-cbind_verify(#state{channel_bindings = Bindings}, <<"p=", Binding/binary>>) when Bindings /= none ->
+cbind_verify(#state{channel_bindings = #{} = Bindings}, <<"p=", Binding/binary>>) ->
     case re:split(Binding, <<",">>, [{parts, 3}, {return, binary}]) of
 	[Type, _, Data] ->
 	    maps:get(Type, Bindings, none) == Data;
 	_ ->
 	    false
     end;
-cbind_verify(#state{channel_bindings = CB}, _) when CB /= none->
+cbind_verify(#state{channel_bindings = #{}}, _) ->
     false;
+cbind_verify(#state{channel_bindings = not_available}, <<"y", _/binary>>) ->
+    true;
 cbind_verify(_, <<"y", _/binary>>) ->
     false;
 cbind_verify(_, <<"n", _/binary>>) ->

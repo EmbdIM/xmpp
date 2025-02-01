@@ -50,7 +50,8 @@
 	 get_tls_last_message/2,
 	 release/1,
 	 get_tls_cb_exporter/1,
-	 get_tls_cert_hash/1]).
+	 get_tls_cert_hash/1,
+	 finish_tls_handshake/1]).
 
 -include("xmpp.hrl").
 -include_lib("public_key/include/public_key.hrl").
@@ -177,8 +178,7 @@ starttls(#socket_state{sockmod = gen_tcp,
 						  tls_certfile = proplists:get_value(certfile, TLSOpts, none)},
 	    SocketData2 = reset_stream(SocketData1),
 	    case fast_tls:recv_data(TLSSocket, <<>>) of
-		{ok, TLSData} ->
-		    parse(SocketData2, TLSData);
+		{ok, Data} -> parse(SocketData2, Data);
 		{error, _} = Err ->
 		    Err
 	    end;
@@ -187,6 +187,21 @@ starttls(#socket_state{sockmod = gen_tcp,
     end;
 starttls(_, _) ->
     erlang:error(badarg).
+
+-spec finish_tls_handshake(socket_state()) ->
+		      {ok, socket_state()} |
+		      {error, inet:posix() | atom() | binary()}.
+ finish_tls_handshake(#socket_state{sockmod = fast_tls,
+		       socket = Socket} = SocketData) ->
+    fast_tls:setopts(Socket, [{active, false}]),
+    case fast_tls:finish_handshake(Socket, 5000) of
+	ok ->
+	    {ok, SocketData};
+	{error, _} = Err ->
+	    Err
+    end;
+finish_tls_handshake(SocketData) ->
+    {ok, SocketData}.
 
 compress(SocketData) -> compress(SocketData, undefined).
 
