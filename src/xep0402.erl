@@ -407,5 +407,6 @@ decode_pep_conference_nick_cdata(__TopXMLNS, <<>>) ->
 decode_pep_conference_nick_cdata(__TopXMLNS, _val) ->
     _val.
 
+encode_pep_conference_nick_cdata(<<>>, _acc) -> _acc;
 encode_pep_conference_nick_cdata(_val, _acc) ->
     [{xmlcdata, _val} | _acc].

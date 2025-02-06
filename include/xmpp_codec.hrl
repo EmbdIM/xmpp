@@ -1412,6 +1412,53 @@
                    configuration :: 'undefined' | {binary(),'undefined' | #xdata{}}}).
 -type ps_event() :: #ps_event{}.
 
+%% Diff with xmpp-1.9.1
+-record(bot, {nick = <<>> :: binary(),
+  type = system :: 'system' | binary(),
+  hash = <<>> :: binary(),
+  parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
+
+-record(feature_fallback_body, {start :: non_neg_integer(),
+'end' :: non_neg_integer()}).
+-type feature_fallback_body() :: #feature_fallback_body{}.
+
+-record(feature_fallback, {for = <<>> :: binary(),
+  body :: 'undefined' | #feature_fallback_body{}}).
+-type feature_fallback() :: #feature_fallback{}.
+
+-record(message_entities, {items = [] :: [#message_entity{}]}).
+-type message_entities() :: #message_entities{}.
+
+-record(message_entity, {type :: atom(),
+  offset = 0 :: non_neg_integer(),
+  length = 0 :: non_neg_integer()}).
+-type message_entity() :: #message_entity{}.
+
+-record(message_payload, {datatype = <<>> :: binary(),
+  json :: 'undefined' | #payload_json{}}).
+-type message_payload() :: #message_payload{}.
+
+-record(message_upload, {body = [] :: [#message_upload_body{}]}).
+-type message_upload() :: #message_upload{}.
+
+-record(message_upload_body, {url = <<>> :: binary(),
+  title = <<>> :: binary()}).
+-type message_upload_body() :: #message_upload_body{}.
+
+-record(payload_json, {data = <<>> :: binary()}).
+-type payload_json() :: #payload_json{}.
+
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
+
+-record(reply, {id = <<>> :: binary(),
+  to :: jid:jid()}).
+-type reply() :: #reply{}.
+
+-record(s2s_bidi_feature, {}).
+-type s2s_bidi_feature() :: #s2s_bidi_feature{}.
+
 -type xmpp_element() :: address() |
                         addresses() |
                         adhoc_actions() |
@@ -1432,6 +1479,7 @@
                         bookmark_conference() |
                         bookmark_storage() |
                         bookmark_url() |
+                        bot() |
                         bytestreams() |
                         caps() |
                         carbons_disable() |
@@ -1463,6 +1511,8 @@
                         fasten_apply_to() |
                         fasten_external() |
                         feature_csi() |
+                        feature_fallback() |
+                        feature_fallback_body() |
                         feature_register() |
                         feature_sm() |
                         forwarded() |
@@ -1509,15 +1559,20 @@
                         media() |
                         media_uri() |
                         message() |
+                        message_entities() |
+                        message_entity() |
                         message_moderate() |
                         message_moderate_21() |
                         message_moderated() |
                         message_moderated_21() |
+                        message_payload() |
                         message_retract() |
                         message_retract_30() |
                         message_retracted() |
                         message_retracted_30() |
                         message_thread() |
+                        message_upload() |
+                        message_upload_body() |
                         mix() |
                         mix_client_join() |
                         mix_client_leave() |
@@ -1553,6 +1608,7 @@
                         offline_item() |
                         oob_x() |
                         origin_id() |
+                        payload_json() |
                         pep_bookmarks_conference() |
                         ping() |
                         presence() |
@@ -1584,6 +1640,8 @@
                         receipt_response() |
                         redirect() |
                         register() |
+                        replace() |
+                        reply() |
                         report() |
                         roster_item() |
                         roster_query() |
@@ -1591,6 +1649,7 @@
                         rsm_first() |
                         rsm_set() |
                         s2s_bidi() |
+                        s2s_bidi_feature() |
                         sasl2_abort() |
                         sasl2_authenticate() |
                         sasl2_authenticaton() |
