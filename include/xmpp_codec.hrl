@@ -1,6 +1,53 @@
 %% Created automatically by XML generator (fxml_gen.erl)
 %% Source: xmpp_codec.spec
 
+%% Diff with xmpp-1.9.1
+-record(bot, {nick = <<>> :: binary(),
+  type = system :: 'system' | binary(),
+  hash = <<>> :: binary(),
+  parse_mode = none :: 'html' | 'markdown' | 'none'}).
+-type bot() :: #bot{}.
+
+-record(feature_fallback_body, {start :: non_neg_integer(),
+  'end' :: non_neg_integer()}).
+-type feature_fallback_body() :: #feature_fallback_body{}.
+
+-record(feature_fallback, {for = <<>> :: binary(),
+  body :: 'undefined' | #feature_fallback_body{}}).
+-type feature_fallback() :: #feature_fallback{}.
+
+-record(message_entity, {type :: atom(),
+  offset = 0 :: non_neg_integer(),
+  length = 0 :: non_neg_integer()}).
+-type message_entity() :: #message_entity{}.
+
+-record(message_entities, {items = [] :: [#message_entity{}]}).
+-type message_entities() :: #message_entities{}.
+
+-record(payload_json, {data = <<>> :: binary()}).
+-type payload_json() :: #payload_json{}.
+
+-record(message_payload, {datatype = <<>> :: binary(),
+  json :: 'undefined' | #payload_json{}}).
+-type message_payload() :: #message_payload{}.
+
+-record(message_upload_body, {url = <<>> :: binary(),
+  title = <<>> :: binary()}).
+-type message_upload_body() :: #message_upload_body{}.
+
+-record(message_upload, {body = [] :: [#message_upload_body{}]}).
+-type message_upload() :: #message_upload{}.
+
+-record(replace, {id = <<>> :: binary()}).
+-type replace() :: #replace{}.
+
+-record(reply, {id = <<>> :: binary(),
+  to :: jid:jid()}).
+-type reply() :: #reply{}.
+
+-record(s2s_bidi_feature, {}).
+-type s2s_bidi_feature() :: #s2s_bidi_feature{}.
+
 -record(text, {lang = <<>> :: binary(),
                data = <<>> :: binary()}).
 -type text() :: #text{}.
@@ -483,16 +530,25 @@
 -record(occupant_id, {id = <<>> :: binary()}).
 -type occupant_id() :: #occupant_id{}.
 
--record(message_moderated_21, {by :: undefined | jid:jid(),
-                               reason :: 'undefined' | binary(),
-                               sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-                               occupant_id :: 'undefined' | #occupant_id{}}).
--type message_moderated_21() :: #message_moderated_21{}.
+-record(retract_id, {id = <<>> :: binary()}).
+-type retract_id() :: #retract_id{}.
 
 -record(message_moderated, {by :: undefined | jid:jid(),
+                            occupant_id :: 'undefined' | #occupant_id{} | binary(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-                            occupant_id :: 'undefined' | #occupant_id{}}).
+                            retract :: 'undefined' | #retract_id{}}).
 -type message_moderated() :: #message_moderated{}.
+
+-record(message_retract, {id = <<>> :: binary(),
+                          reason :: 'undefined' | binary(),
+                          moderated :: 'undefined' | #message_moderated{}}).
+-type message_retract() :: #message_retract{}.
+
+-record(message_moderated_21, {by :: undefined | jid:jid(),
+  reason :: 'undefined' | binary(),
+  sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+  occupant_id :: 'undefined' | #occupant_id{}}).
+-type message_moderated_21() :: #message_moderated_21{}.
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
@@ -992,6 +1048,44 @@
                   complete :: 'false' | 'true' | 'undefined'}).
 -type mam_fin() :: #mam_fin{}.
 
+-record(disco_items, {node = <<>> :: binary(),
+                      items = [] :: [#disco_item{}],
+                      rsm :: 'undefined' | #rsm_set{}}).
+-type disco_items() :: #disco_items{}.
+
+-record(vcard_name, {family :: 'undefined' | binary(),
+                     given :: 'undefined' | binary(),
+                     middle :: 'undefined' | binary(),
+                     prefix :: 'undefined' | binary(),
+                     suffix :: 'undefined' | binary()}).
+-type vcard_name() :: #vcard_name{}.
+
+-record(inbox_entry, {unread :: 'undefined' | non_neg_integer(),
+                      jid :: undefined | jid:jid(),
+                      id = <<>> :: binary()}).
+-type inbox_entry() :: #inbox_entry{}.
+
+-record(media_uri, {type = <<>> :: binary(),
+                    uri = <<>> :: binary()}).
+-type media_uri() :: #media_uri{}.
+
+-record(media, {height :: 'undefined' | non_neg_integer(),
+                width :: 'undefined' | non_neg_integer(),
+                uri = [] :: [#media_uri{}]}).
+-type media() :: #media{}.
+
+-record(mix_destroy, {channel :: any(),
+                      xmlns = <<>> :: binary()}).
+-type mix_destroy() :: #mix_destroy{}.
+
+-record(vcard_key, {type :: 'undefined' | binary(),
+                    cred :: 'undefined' | binary()}).
+-type vcard_key() :: #vcard_key{}.
+
+-record(reply, {id = <<>> :: binary(),
+                to :: jid:jid()}).
+-type reply() :: #reply{}.
+
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
 -type inbox_query() :: #inbox_query{}.
 
@@ -1113,11 +1207,6 @@
                       items = [] :: [#disco_item{}],
                       rsm :: 'undefined' | #rsm_set{}}).
 -type disco_items() :: #disco_items{}.
-
--record(message_retract, {id = <<>> :: binary(),
-                          reason :: 'undefined' | binary(),
-                          moderated :: 'undefined' | #message_moderated{}}).
--type message_retract() :: #message_retract{}.
 
 -record(message_moderate_21, {reason :: 'undefined' | binary(),
                               retract :: 'undefined' | #message_retract{}}).
@@ -1412,53 +1501,6 @@
                    configuration :: 'undefined' | {binary(),'undefined' | #xdata{}}}).
 -type ps_event() :: #ps_event{}.
 
-%% Diff with xmpp-1.9.1
--record(bot, {nick = <<>> :: binary(),
-  type = system :: 'system' | binary(),
-  hash = <<>> :: binary(),
-  parse_mode = none :: 'html' | 'markdown' | 'none'}).
--type bot() :: #bot{}.
-
--record(feature_fallback_body, {start :: non_neg_integer(),
-'end' :: non_neg_integer()}).
--type feature_fallback_body() :: #feature_fallback_body{}.
-
--record(feature_fallback, {for = <<>> :: binary(),
-  body :: 'undefined' | #feature_fallback_body{}}).
--type feature_fallback() :: #feature_fallback{}.
-
--record(message_entities, {items = [] :: [#message_entity{}]}).
--type message_entities() :: #message_entities{}.
-
--record(message_entity, {type :: atom(),
-  offset = 0 :: non_neg_integer(),
-  length = 0 :: non_neg_integer()}).
--type message_entity() :: #message_entity{}.
-
--record(message_payload, {datatype = <<>> :: binary(),
-  json :: 'undefined' | #payload_json{}}).
--type message_payload() :: #message_payload{}.
-
--record(message_upload, {body = [] :: [#message_upload_body{}]}).
--type message_upload() :: #message_upload{}.
-
--record(message_upload_body, {url = <<>> :: binary(),
-  title = <<>> :: binary()}).
--type message_upload_body() :: #message_upload_body{}.
-
--record(payload_json, {data = <<>> :: binary()}).
--type payload_json() :: #payload_json{}.
-
--record(replace, {id = <<>> :: binary()}).
--type replace() :: #replace{}.
-
--record(reply, {id = <<>> :: binary(),
-  to :: jid:jid()}).
--type reply() :: #reply{}.
-
--record(s2s_bidi_feature, {}).
--type s2s_bidi_feature() :: #s2s_bidi_feature{}.
-
 -type xmpp_element() :: address() |
                         addresses() |
                         adhoc_actions() |
@@ -1566,6 +1608,7 @@
                         message_moderated() |
                         message_moderated_21() |
                         message_payload() |
+                        retract_id() |
                         message_retract() |
                         message_retract_30() |
                         message_retracted() |

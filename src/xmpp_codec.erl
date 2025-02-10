@@ -1146,6 +1146,8 @@ get_mod(<<"stream:error">>,
     rfc6120;
 get_mod(<<"mix">>, <<"urn:xmpp:mix:core:1">>) ->
     xep0369;
+get_mod(<<"entity">>, <<"urn:xmpp:message-entity">>) ->
+    deribit_codec;
 get_mod(<<"moderate">>,
         <<"urn:xmpp:message-moderate:1">>) ->
     xep0425;
@@ -1683,6 +1685,7 @@ get_mod(<<"item">>,
 get_mod(<<"range">>,
         <<"urn:xmpp:jingle:apps:file-transfer:5">>) ->
     xep0234;
+get_mod(<<"json">>, <<"urn:xmpp:json:0">>) -> xep0432;
 get_mod(<<"client-leave">>, <<"urn:xmpp:mix:pam:2">>) ->
     xep0405;
 get_mod(<<"request">>, <<"urn:xmpp:http:upload">>) ->
@@ -1989,6 +1992,7 @@ get_mod({x509_register}) -> xep0417;
 get_mod({roster_item, _, _, _, _, _, _}) -> rfc6121;
 get_mod({rsm_set, _, _, _, _, _, _, _}) -> xep0059;
 get_mod({avatar_meta, _, _}) -> xep0084;
+get_mod({message_entity, _, _, _}) -> deribit_codec;
 get_mod({roster_query, _, _, _}) -> rfc6121;
 get_mod({unblock, _}) -> xep0191;
 get_mod({stat_error, _, _}) -> xep0039;
@@ -2008,6 +2012,7 @@ get_mod({markable}) -> xep0333;
 get_mod({message_moderated_21, _, _, _, _}) -> xep0425;
 get_mod({bind, _, _}) -> rfc6120;
 get_mod({rsm_first, _, _}) -> xep0059;
+get_mod({payload_json, _}) -> xep0432;
 get_mod({caps, _, _, _, _}) -> xep0115;
 get_mod({xdata, _, _, _, _, _, _}) -> xep0004;
 get_mod({ps_options, _, _, _, _}) -> xep0060;
@@ -2022,12 +2027,14 @@ get_mod({muc_invite, _, _, _, _}) -> xep0045;
 get_mod({mix_client_join, _, _, _}) -> xep0405;
 get_mod({jingle_reason, _, _, _}) -> xep0166;
 get_mod({ps_event, _, _, _, _, _, _}) -> xep0060;
+get_mod({message_upload_body, _, _}) -> deribit_codec;
 get_mod({privileged_iq, _}) -> xep0356;
 get_mod({sasl_mechanisms, _}) -> rfc6120;
 get_mod({starttls, _}) -> rfc6120;
 get_mod({stream_start, _, _, _, _, _, _, _, _}) ->
     rfc6120;
 get_mod({credentials, _}) -> xep0215;
+get_mod({message_upload, _}) -> deribit_codec;
 get_mod({'see-other-host', _}) -> rfc6120;
 get_mod({muc_destroy, _, _, _, _}) -> xep0045;
 get_mod({hint, _}) -> xep0334;

@@ -7,12 +7,12 @@
 
 do_decode(<<"retracted">>,
           <<"urn:xmpp:message-retract:0">>, El, Opts) ->
-    decode_message_retracted_30(<<"urn:xmpp:message-retract:0">>,
+    decode_message_retracted(<<"urn:xmpp:message-retract:0">>,
                                 Opts,
                                 El);
 do_decode(<<"retract">>,
           <<"urn:xmpp:message-retract:0">>, El, Opts) ->
-    decode_message_retract_30(<<"urn:xmpp:message-retract:0">>,
+    decode_message_retract_21(<<"urn:xmpp:message-retract:0">>,
                               Opts,
                               El);
 do_decode(<<"retracted">>,
@@ -20,14 +20,14 @@ do_decode(<<"retracted">>,
     decode_message_retracted(<<"urn:xmpp:message-retract:1">>,
                              Opts,
                              El);
-do_decode(<<"retract">>,
-          <<"urn:xmpp:message-retract:0">>, El, Opts) ->
-    decode_message_retract(<<"urn:xmpp:message-retract:0">>,
-                           Opts,
-                           El);
+%%do_decode(<<"retract">>,
+%%          <<"urn:xmpp:message-retract:0">>, El, Opts) ->
+%%    decode_message_retract(<<"urn:xmpp:message-retract:0">>,
+%%                           Opts,
+%%                           El);
 do_decode(<<"retract">>,
           <<"urn:xmpp:message-retract:1">>, El, Opts) ->
-    decode_message_retract(<<"urn:xmpp:message-retract:1">>,
+    decode_message_retract_21(<<"urn:xmpp:message-retract:1">>,
                            Opts,
                            El);
 do_decode(<<"replace">>,
@@ -44,11 +44,13 @@ tags() ->
     [{<<"retracted">>, <<"urn:xmpp:message-retract:0">>},
      {<<"retract">>, <<"urn:xmpp:message-retract:0">>},
      {<<"retracted">>, <<"urn:xmpp:message-retract:1">>},
-     {<<"retract">>, <<"urn:xmpp:message-retract:1">>}],
+     {<<"retract">>, <<"urn:xmpp:message-retract:1">>},
      {<<"replace">>, <<"urn:xmpp:message-correct:0">>}].
 
 do_encode({replace, _} = Replace, TopXMLNS) ->
   encode_replace(Replace, TopXMLNS);
+do_encode({retract_id, _} = Retract, TopXMLNS) ->
+  encode_message_retract_21(Retract, TopXMLNS);
 do_encode({message_retract, _, _, _} = Retract,
           TopXMLNS) ->
     encode_message_retract(Retract, TopXMLNS);
@@ -63,6 +65,7 @@ do_encode({message_retracted_30, _, _, _, _} =
           TopXMLNS) ->
     encode_message_retracted_30(Retracted, TopXMLNS).
 
+do_get_name({retract_id, _}) -> <<"retract">>;
 do_get_name({message_retract, _, _, _}) ->
     <<"retract">>;
 do_get_name({message_retract_30}) -> <<"retract">>;
@@ -72,6 +75,8 @@ do_get_name({message_retracted_30, _, _, _, _}) ->
     <<"retracted">>;
 do_get_name({replace, _}) -> <<"replace">>.
 
+do_get_ns({retract_id, _}) ->
+  <<"urn:xmpp:message-retract:0">>;
 do_get_ns({message_retract, _, _, _}) ->
     <<"urn:xmpp:message-retract:1">>;
 do_get_ns({message_retract_30}) ->
@@ -105,6 +110,7 @@ set_els({message_retracted_30, _by, _from, _stamp, _},
     {message_retracted_30, _by, _from, _stamp, _sub_els}.
 
 pp(replace, 1) -> [id];
+pp(retract_id, 1) -> [id];
 pp(message_retract, 3) -> [id, reason, moderated];
 pp(message_retracted, 5) ->
     [id, by, from, stamp, sub_els];
@@ -115,6 +121,7 @@ pp(_, _) -> no.
 
 records() ->
     [{replace, 1},
+     {retract_id, 1},
      {message_retract, 3},
      {message_retracted, 5},
      {message_retract_30, 0},
@@ -566,8 +573,7 @@ decode_message_retract_attrs(__TopXMLNS, [_ | _attrs],
     decode_message_retract_attrs(__TopXMLNS, _attrs, Id);
 decode_message_retract_attrs(__TopXMLNS, [], Id) ->
     decode_message_retract_attr_id(__TopXMLNS, Id).
-
-encode_message_retract({message_retract, Id},
+encode_message_retract({retract_id, Id},
                        __TopXMLNS) ->
     __NewTopXMLNS = xmpp_codec:choose_top_xmlns(<<>>,
                                                 [<<"urn:xmpp:message-retract:0">>,
@@ -622,6 +628,44 @@ decode_message_retract_attr_id(__TopXMLNS, _val) ->
 
 encode_message_retract_attr_id(<<>>, _acc) -> _acc;
 encode_message_retract_attr_id(_val, _acc) ->
+    [{<<"id">>, _val} | _acc].
+
+%% 21
+
+decode_message_retract_21(__TopXMLNS, __Opts,
+                       {xmlel, <<"retract">>, _attrs, _els}) ->
+    Id = decode_message_retract_21_attrs(__TopXMLNS,
+                                      _attrs,
+                                      undefined),
+    {retract_id, Id}.
+
+decode_message_retract_21_attrs(__TopXMLNS,
+                             [{<<"id">>, _val} | _attrs], _Id) ->
+    decode_message_retract_21_attrs(__TopXMLNS, _attrs, _val);
+decode_message_retract_21_attrs(__TopXMLNS, [_ | _attrs],
+                             Id) ->
+    decode_message_retract_21_attrs(__TopXMLNS, _attrs, Id);
+decode_message_retract_21_attrs(__TopXMLNS, [], Id) ->
+    decode_message_retract_21_attr_id(__TopXMLNS, Id).
+encode_message_retract_21({retract_id, Id},
+                       __TopXMLNS) ->
+    __NewTopXMLNS = xmpp_codec:choose_top_xmlns(<<>>,
+                                                [<<"urn:xmpp:message-retract:0">>,
+                                                 <<"urn:xmpp:message-retract:1">>],
+                                                __TopXMLNS),
+    _els = [],
+    _attrs = encode_message_retract_21_attr_id(Id,
+                                            xmpp_codec:enc_xmlns_attrs(__NewTopXMLNS,
+                                                                       __TopXMLNS)),
+    {xmlel, <<"retract">>, _attrs, _els}.
+
+decode_message_retract_21_attr_id(__TopXMLNS, undefined) ->
+    <<>>;
+decode_message_retract_21_attr_id(__TopXMLNS, _val) ->
+    _val.
+
+encode_message_retract_21_attr_id(<<>>, _acc) -> _acc;
+encode_message_retract_21_attr_id(_val, _acc) ->
     [{<<"id">>, _val} | _acc].
 
 decode_replace(__TopXMLNS, __Opts,
