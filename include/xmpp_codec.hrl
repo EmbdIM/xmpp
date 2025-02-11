@@ -533,22 +533,21 @@
 -record(retract_id, {id = <<>> :: binary()}).
 -type retract_id() :: #retract_id{}.
 
--record(message_moderated, {by :: undefined | jid:jid(),
+-record(message_moderated_21, {by :: undefined | jid:jid(),
                             occupant_id :: 'undefined' | #occupant_id{} | binary(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()],
                             retract :: 'undefined' | #retract_id{}}).
 -type message_moderated() :: #message_moderated{}.
 
+-record(message_moderated, {by :: undefined | jid:jid(),
+                            sub_els = [] :: [xmpp_element() | fxml:xmlel()],
+                            occupant_id :: 'undefined' | #occupant_id{}}).
+-type message_moderated() :: #message_moderated{}.
+
 -record(message_retract, {id = <<>> :: binary(),
                           reason :: 'undefined' | binary(),
                           moderated :: 'undefined' | #message_moderated{}}).
--type message_retract() :: #message_retract{}.
-
--record(message_moderated_21, {by :: undefined | jid:jid(),
-  reason :: 'undefined' | binary(),
-  sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-  occupant_id :: 'undefined' | #occupant_id{}}).
--type message_moderated_21() :: #message_moderated_21{}.
+-type message_retract() :: #message_retract{}.\
 
 -record(hash_used, {algo = <<>> :: binary()}).
 -type hash_used() :: #hash_used{}.
@@ -1048,43 +1047,12 @@
                   complete :: 'false' | 'true' | 'undefined'}).
 -type mam_fin() :: #mam_fin{}.
 
--record(disco_items, {node = <<>> :: binary(),
-                      items = [] :: [#disco_item{}],
-                      rsm :: 'undefined' | #rsm_set{}}).
--type disco_items() :: #disco_items{}.
-
 -record(vcard_name, {family :: 'undefined' | binary(),
                      given :: 'undefined' | binary(),
                      middle :: 'undefined' | binary(),
                      prefix :: 'undefined' | binary(),
                      suffix :: 'undefined' | binary()}).
 -type vcard_name() :: #vcard_name{}.
-
--record(inbox_entry, {unread :: 'undefined' | non_neg_integer(),
-                      jid :: undefined | jid:jid(),
-                      id = <<>> :: binary()}).
--type inbox_entry() :: #inbox_entry{}.
-
--record(media_uri, {type = <<>> :: binary(),
-                    uri = <<>> :: binary()}).
--type media_uri() :: #media_uri{}.
-
--record(media, {height :: 'undefined' | non_neg_integer(),
-                width :: 'undefined' | non_neg_integer(),
-                uri = [] :: [#media_uri{}]}).
--type media() :: #media{}.
-
--record(mix_destroy, {channel :: any(),
-                      xmlns = <<>> :: binary()}).
--type mix_destroy() :: #mix_destroy{}.
-
--record(vcard_key, {type :: 'undefined' | binary(),
-                    cred :: 'undefined' | binary()}).
--type vcard_key() :: #vcard_key{}.
-
--record(reply, {id = <<>> :: binary(),
-                to :: jid:jid()}).
--type reply() :: #reply{}.
 
 -record(inbox_query, {rsm :: 'undefined' | #rsm_set{}}).
 -type inbox_query() :: #inbox_query{}.
@@ -1358,13 +1326,6 @@
 
 -record(carbons_private, {}).
 -type carbons_private() :: #carbons_private{}.
-
--record(vcard_name, {family :: 'undefined' | binary(),
-                     given :: 'undefined' | binary(),
-                     middle :: 'undefined' | binary(),
-                     prefix :: 'undefined' | binary(),
-                     suffix :: 'undefined' | binary()}).
--type vcard_name() :: #vcard_name{}.
 
 -record(vcard_temp, {version :: 'undefined' | binary(),
                      fn :: 'undefined' | binary(),
