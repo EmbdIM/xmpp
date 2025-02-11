@@ -539,14 +539,14 @@
                             retract :: 'undefined' | #retract_id{}}).
 -type message_moderated_21() :: #message_moderated_21{}.
 
--record(message_moderated_21, {by :: undefined | jid:jid(),
+-record(message_moderated, {by :: undefined | jid:jid(),
                             sub_els = [] :: [xmpp_element() | fxml:xmlel()],
                             occupant_id :: 'undefined' | #occupant_id{}}).
--type message_moderated() :: #message_moderated_21{}.
+-type message_moderated() :: #message_moderated{}.
 
 -record(message_retract, {id = <<>> :: binary(),
                           reason :: 'undefined' | binary(),
-                          moderated :: 'undefined' | #message_moderated_21{}}).
+                          moderated :: 'undefined' | #message_moderated{}}).
 -type message_retract() :: #message_retract{}.
 
 -record(hash_used, {algo = <<>> :: binary()}).
