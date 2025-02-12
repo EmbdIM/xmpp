@@ -5,14 +5,14 @@
 -xml(message_upload,
 #elem{name = <<"upload">>,
 	xmlns = <<"urn:xmpp:upload:0">>,
-	module = 'deribit_codec',
+	module = 'xmpp_codec_embdim',
 	result = {message_upload, '$body'},
 	refs = [#ref{name = message_upload_body, min = 0, max = infinity, label = '$body'}]}).
 
 -xml(message_upload_body,
 #elem{name = <<"body">>,
 	xmlns = <<"urn:xmpp:upload:0">>,
-	module = 'deribit_codec',
+	module = 'xmpp_codec_embdim',
 	result = {message_upload_body, '$url', '$title'},
 	attrs = [#attr{name = <<"url">>, required = true},
 		#attr{name = <<"title">>}]}).
@@ -53,7 +53,7 @@
 -xml(bot,
 #elem{name = <<"bot">>,
 	xmlns = <<"urn:deribit:system">>,
-	module = 'deribit_codec',
+	module = 'xmpp_codec_embdim',
 	result = {bot, '$nick','$type', '$hash', '$parse_mode'},
 	attrs = [#attr{name = <<"nick">>},
 		#attr{name = <<"type">>, default = system},
@@ -68,7 +68,7 @@
 -xml(message_entity,
 #elem{name = <<"entity">>,
 	xmlns = <<"urn:xmpp:message-entity">>,
-	module = 'deribit_codec',
+	module = 'xmpp_codec_embdim',
 	result = {message_entity, '$type', '$offset', '$length'},
 	attrs = [#attr{name = <<"type">>,
 		always_encode = true,
@@ -86,7 +86,7 @@
 -xml(message_entities,
 #elem{name = <<"entities">>,
 	xmlns = <<"urn:xmpp:message-entity">>,
-	module = 'deribit_codec',
+	module = 'xmpp_codec_embdim',
 	result = {message_entities, '$items'},
 	refs = [#ref{name = message_entity, label = '$items'}]}).
 

@@ -1,7 +1,7 @@
 %% Created automatically by XML generator (fxml_gen.erl)
-%% Source: xmpp_codec.spec
+%% Source: xmpp_codec_embdim.spec
 
--module(deribit_codec).
+-module(xmpp_codec_embdim).
 
 -compile(export_all).
 
