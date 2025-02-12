@@ -269,7 +269,7 @@ decode_message_moderated_21_els(__TopXMLNS, __Opts,
             decode_message_moderated_21_els(__TopXMLNS,
                                             __Opts,
                                             _els,
-                                            xep0421:decode_occupant_id(<<"urn:xmpp:retract:0">>,
+                                            xep0424:decode_message_retract_21(<<"urn:xmpp:retract:0">>,
                                                                        __Opts,
                                                                        _el),
                                             Reason,
@@ -393,7 +393,7 @@ encode_message_moderated_21({message_moderated_21,
     _acc;
 'encode_message_moderated_21_$occupant_id'(Occupant_id,
                                            __TopXMLNS, _acc) ->
-    [xep0421:encode_occupant_id(Occupant_id, __TopXMLNS)
+    [xep0424:encode_message_retract_21(Occupant_id, __TopXMLNS)
      | _acc].
 
 'encode_message_moderated_21_$reason'(undefined,
