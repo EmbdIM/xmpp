@@ -1,7 +1,8 @@
+%% Specification.SPEC_HEADING
 
--record(text, {lang = <<>> :: binary(),
-               data = <<>> :: binary()}).
+-record(text, {lang = <<>> :: binary(), data = <<>> :: binary()}).
 -type text() :: #text{}.
+
 -xml(message_upload,
 #elem{name = <<"upload">>,
 	xmlns = <<"urn:xmpp:upload:0">>,
@@ -5222,6 +5223,15 @@
 	   attrs = [#attr{name = <<"id">>,
 	                  required = true}]}).
 
+-xml(retract_id,
+     #elem{name = <<"retract">>,
+	   xmlns = <<"urn:xmpp:retract:0">>,
+	   module = 'xep0424',
+	   result = {retract_id, '$id'},
+	   attrs = [#attr{name = <<"id">>,
+	                  required = true}]}).
+
+
 -xml(fasten_apply_to,
      #elem{name = <<"apply-to">>,
 	   xmlns = <<"urn:xmpp:fasten:0">>,
@@ -5322,14 +5332,14 @@
      #elem{name = <<"moderated">>,
 	   xmlns = <<"urn:xmpp:message-moderate:0">>,
 	   module = 'xep0425',
-	   result = {message_moderated_21, '$by', '$reason', '$_els', '$occupant_id'},
+	   result = {message_moderated_21, '$by', '$reason', '$_els', '$retract'},
        attrs = [#attr{name = <<"by">>,
                       enc = {jid, encode, []},
                       dec = {jid, decode, []}}],
 	   refs = [#ref{name = message_moderate_reason_21, min = 0, max = 1,
                     label = '$reason'},
-               #ref{name = occupant_id, min = 0, max = 1,
-                    label = '$occupant_id'}]}).
+               #ref{name = retract_id, min = 0, max = 1,
+                    label = '$retract'}]}).
 
 -xml(message_moderate_reason,
      #elem{name = <<"reason">>,

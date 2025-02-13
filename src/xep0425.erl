@@ -87,7 +87,7 @@ get_els({message_moderated,
     _sub_els;
 get_els({message_moderated_21,
          _by,
-         _occupant_id, %% or _reason,
+         _reason,
          _sub_els,
          _retract}) ->
     _sub_els.
