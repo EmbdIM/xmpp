@@ -111,7 +111,7 @@ pp(message_moderate, 3) -> [id, reason, retract];
 pp(message_moderated, 3) -> [by, sub_els, occupant_id];
 pp(message_moderate_21, 2) -> [reason, retract];
 pp(message_moderated_21, 4) ->
-    [by, occupant_id, sub_els, retract];
+    [by, reason, sub_els, retract];
 pp(_, _) -> no.
 
 records() ->

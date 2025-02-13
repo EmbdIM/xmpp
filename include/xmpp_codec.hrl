@@ -534,9 +534,9 @@
 -type retract_id() :: #retract_id{}.
 
 -record(message_moderated_21, {by :: undefined | jid:jid(),
-                               occupant_id :: 'undefined' | #occupant_id{} | binary(),
+                               reason :: 'undefined' | binary(),
                                sub_els = [] :: [xmpp_element() | fxml:xmlel()],
-                               retract :: 'undefined' | #retract_id{}}).
+                               retract :: 'undefined' | #retract_id{} | #occupant_id{}}).
 -type message_moderated_21() :: #message_moderated_21{}.
 
 -record(message_moderated, {by :: undefined | jid:jid(),
