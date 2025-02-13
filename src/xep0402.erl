@@ -402,7 +402,8 @@ encode_pep_conference_nick(Cdata, __TopXMLNS) ->
     {xmlel, <<"nick">>, _attrs, _els}.
 
 decode_pep_conference_nick_cdata(__TopXMLNS, <<>>) ->
-    <<>>;
+    erlang:error({xmpp_codec,
+                  {missing_cdata, <<>>, <<"nick">>, __TopXMLNS}});
 decode_pep_conference_nick_cdata(__TopXMLNS, _val) ->
     _val.
 

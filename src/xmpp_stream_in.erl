@@ -74,7 +74,8 @@
 -type stream_state() :: accepting | wait_for_stream | wait_for_handshake |
 			wait_for_starttls | wait_for_sasl_request |
 			wait_for_sasl_response | wait_for_bind |
-			established | disconnected | wait_for_sasl2_response.
+			established | disconnected | wait_for_sasl2_response |
+			wait_for_sasl2_next | wait_for_sasl2_task_data.
 -type stop_reason() :: {stream, reset | {in | out, stream_error()}} |
 		       {tls, inet:posix() | atom() | binary()} |
 		       {socket, inet:posix() | atom()} |
@@ -104,11 +105,13 @@
 -callback get_password_fun(xmpp_sasl:mechanism(), state()) -> fun().
 -callback check_password_fun(xmpp_sasl:mechanism(), state()) -> fun().
 -callback check_password_digest_fun(xmpp_sasl:mechanism(), state()) -> fun().
+-callback get_fast_tokens_fun(xmpp_sasl:mechanism(), state()) -> fun().
 -callback bind(binary(), state()) -> {ok, state()} | {error, stanza_error(), state()}.
 -callback compress_methods(state()) -> [binary()].
 -callback tls_options(state()) -> [proplists:property()].
 -callback tls_required(state()) -> boolean().
 -callback tls_enabled(state()) -> boolean().
+-callback allow_unencrypted_sasl2(state()) -> boolean().
 -callback sasl_mechanisms([xmpp_sasl:mechanism()], state()) -> [xmpp_sasl:mechanism()].
 -callback sasl_options(state()) -> [tuple()].
 -callback unauthenticated_stream_features(state()) -> [xmpp_element()].
@@ -137,11 +140,13 @@
 		     get_password_fun/2,
 		     check_password_fun/2,
 		     check_password_digest_fun/2,
+		     get_fast_tokens_fun/2,
 		     bind/2,
 		     compress_methods/1,
 		     tls_options/1,
 		     tls_required/1,
 		     tls_enabled/1,
+		     allow_unencrypted_sasl2/1,
 		     sasl_mechanisms/2,
 		     sasl_options/1,
 		     unauthenticated_stream_features/1,
@@ -668,6 +673,7 @@ process_stream(#stream_start{to = #jid{server = Server, lserver = LServer},
 process_element(Pkt, #{stream_state := StateName, lang := Lang,
 		       stream_encrypted := Encrypted} = State) ->
     Sasl2 = maps:is_key(sasl2_stream_from, State),
+    AllowUnencryptedSasl2 = allow_unencrypted_sasl2(State),
     case Pkt of
 	#starttls{} when StateName == wait_for_starttls;
 			 StateName == wait_for_sasl_request ->
@@ -698,7 +704,8 @@ process_element(Pkt, #{stream_state := StateName, lang := Lang,
 	    send_pkt(State, #sasl_failure{reason = 'aborted'});
 	#sasl_success{} ->
 	    State;
-	#sasl2_authenticate{} when StateName == wait_for_starttls; (not Encrypted) ->
+	#sasl2_authenticate{} when StateName == wait_for_starttls;
+				   not (Encrypted or AllowUnencryptedSasl2) ->
 	    send_pkt(State, #sasl2_failure{reason = 'encryption-required'});
 	#sasl2_authenticate{} when StateName == wait_for_sasl_request, Sasl2 ->
 	    process_sasl2_request(Pkt, maps:remove(sasl_state, State));
@@ -726,10 +733,16 @@ process_element(Pkt, #{stream_state := StateName, lang := Lang,
 	    State;
 	#stream_error{} ->
 	    process_stream_end({stream, {in, Pkt}}, State);
+	#sasl2_next{} when StateName == wait_for_sasl2_next ->
+	    process_sasl2_next(Pkt, State);
+	#sasl2_task_data{} when StateName == wait_for_sasl2_task_data ->
+	    process_sasl2_task_data(Pkt, State);
 	_ when StateName == wait_for_sasl_request;
 	       StateName == wait_for_handshake;
 	       StateName == wait_for_sasl_response;
-	       StateName == wait_for_sasl2_response ->
+	       StateName == wait_for_sasl2_response;
+	       StateName == wait_for_sasl2_next;
+	       StateName == wait_for_sasl2_task_data ->
 	    process_unauthenticated_packet(Pkt, State);
 	_ when StateName == wait_for_starttls ->
 	    Txt = <<"Use of STARTTLS required">>,
@@ -916,8 +929,10 @@ process_starttls_failure(Why, State) ->
     end.
 
 -spec init_channel_bindings(state()) -> state().
-init_channel_bindings(#{sasl_channel_bindings := _} = State) ->
+init_channel_bindings(#{sasl_channel_bindings := #{}} = State) ->
     State;
+init_channel_bindings(#{stream_encrypted := false} = State) ->
+    State#{sasl_channel_bindings => not_available};
 init_channel_bindings(#{socket := Socket} = State) ->
 	R1 = case xmpp_socket:get_tls_last_message(Socket, peer) of
 		 {ok, Data} ->
@@ -965,9 +980,9 @@ process_sasl_request(#sasl_auth{mechanism = Mech, text = ClientIn},
 			     end
 		     catch _:{?MODULE, undef} -> Mechs
 		     end,
-	    SASLState = xmpp_sasl:server_new(LServer, GetPW, CheckPW, CheckPWDigest),
+	    SASLState = xmpp_sasl:server_new(LServer, GetPW, CheckPW, CheckPWDigest, undefined),
 	    CB = maps:get(sasl_channel_bindings, State1, none),
-	    Res = xmpp_sasl:server_start(SASLState, Mech, ClientIn, CB, Mechs2),
+	    Res = xmpp_sasl:server_start(SASLState, Mech, ClientIn, CB, Mechs2, undefined),
 	    process_sasl_result(Res, disable_sasl2(State1#{sasl_state => SASLState}));
 	false ->
 	    process_sasl_result({error, unsupported_mechanism, <<"">>}, disable_sasl2(State1))
@@ -1053,9 +1068,12 @@ process_sasl2_request(#sasl2_authenticate{mechanism = Mech, initial_response = C
 					  user_agent = UA} = Pkt,
 		     #{lserver := LServer} = State) ->
     State1 = State#{sasl_mech => Mech},
-    Mechs = get_sasl_mechanisms(State1),
+    FastMechs = try callback(fast_mechanisms, State)
+		catch _:{?MODULE, undef} -> []
+		end,
+    Mechs = get_sasl_mechanisms(State1) ++ FastMechs,
     UAId = case UA of
-	       #sasl2_user_agent{id = ID} when id /= <<>> ->
+	       #sasl2_user_agent{id = ID} when ID /= <<>> ->
 		   ID;
 	       _ ->
 		   undefined
@@ -1078,6 +1096,7 @@ process_sasl2_request(#sasl2_authenticate{mechanism = Mech, initial_response = C
 	    GetPW = get_password_fun(Mech, State1),
 	    CheckPW = check_password_fun(Mech, State1),
 	    CheckPWDigest = check_password_digest_fun(Mech, State1),
+	    GetFastTokens = get_fast_tokens_fun(Mech, State1),
 	    Mechs2 = try callback(sasl_options, State) of
 			 Opts ->
 			     case lists:keyfind(scram_downgrade_protection, 1, Opts) of
@@ -1086,9 +1105,10 @@ process_sasl2_request(#sasl2_authenticate{mechanism = Mech, initial_response = C
 			     end
 		     catch _:{?MODULE, undef} -> Mechs
 		     end,
-	    SASLState = xmpp_sasl:server_new(LServer, GetPW, CheckPW, CheckPWDigest),
+	    SASLState = xmpp_sasl:server_new(LServer, GetPW, CheckPW,
+					     CheckPWDigest, GetFastTokens),
 	    CB = maps:get(sasl_channel_bindings, State1, none),
-	    Res = xmpp_sasl:server_start(SASLState, Mech, ClientIn, CB, Mechs2),
+	    Res = xmpp_sasl:server_start(SASLState, Mech, ClientIn, CB, Mechs2, UAId),
 	    process_sasl2_result(Res, State1#{sasl_state => SASLState,
 					      sasl2_inline_els => SaslInline,
 					      sasl2_ua_id => UAId});
@@ -1114,7 +1134,7 @@ process_sasl2_result({error, Reason, User}, State) ->
 
 -spec process_sasl2_success([xmpp_sasl:sasl_property()], binary(), state()) -> state().
 process_sasl2_success(Props, ServerOut,
-		     #{sasl_mech := Mech, server := Server,
+		     #{sasl_mech := Mech,
 		       sasl2_inline_els := InlineEls,
 		       sasl2_stream_from := #jid{luser = InitUser}} = State) ->
     User = identity(Props),
@@ -1122,8 +1142,10 @@ process_sasl2_success(Props, ServerOut,
 	process_sasl2_failure(not_authorized, User, State);
 	true ->
 	    AuthModule = proplists:get_value(auth_module, Props),
-	    State1 = try callback(handle_auth_success, User, Mech, AuthModule, State)
-		     catch _:{?MODULE, undef} -> State
+	    ExtraAuthInfo = proplists:get_value(extra_info, Props),
+	    State0 = State#{sasl2_axtra_auth_info => ExtraAuthInfo},
+	    State1 = try callback(handle_auth_success, User, Mech, AuthModule, State0)
+		     catch _:{?MODULE, undef} -> State0
 		     end,
 	    case is_disconnected(State1) of
 		true -> State1;
@@ -1136,29 +1158,69 @@ process_sasl2_success(Props, ServerOut,
 		    catch _:{?MODULE, undef} -> {State2, InlineEls, []}
 		    end,
 
-		    {State4, BindResults} = process_bind2(State3, NewEls),
-		    Results2 = Results ++ BindResults,
-
-		    NewJid = jid:make(User, Server, maps:get(resource, State4, <<>>)),
-		    State5 = send_pkt(State4, #sasl2_success{additional_data = ServerOut,
-							     sub_els = Results2,
-							     jid = NewJid}),
-		    case is_disconnected(State5) of
-			true -> State5;
+		    case NewEls of
+			{continue, Tasks} ->
+			    send_pkt(State3#{stream_state => wait_for_sasl2_next},
+				     #sasl2_continue{additional_data = ServerOut,
+						     tasks = Tasks});
 			_ ->
-			    State6 = try callback(handle_sasl2_inline_post, InlineEls,
-						  Results2, State5)
-				     catch _:{?MODULE, undef} -> State5
-				     end,
-			    State7 = process_bind2_post(State6, NewEls, Results2),
-			    case is_disconnected(State7) of
-				true -> State7;
-				false ->
-				    map_remove_keys(State7, [sasl2_stream_from, sasl2_inline_els,
-							     sasl2_ua_id, sasl_state, sasl_mech,
-							     sasl_channel_bindings])
-			    end
+			    process_sasl2_post_success(NewEls, Results, User, ServerOut, State3)
 		    end
+	    end
+    end.
+
+process_sasl2_next(#sasl2_next{task = Task, sub_els = Els},
+		   #{sasl2_inline_els := InlineEls} = State) ->
+    Res = try callback(handle_sasl2_task_next, Task, Els, InlineEls, State)
+	  catch _:{?MODULE, undef} -> []
+	  end,
+    case Res of
+	{task_data, Els2, State2} ->
+	    send_pkt(State2#{stream_state => wait_for_sasl2_task_data},
+		     #sasl2_task_data{sub_els = Els2});
+	{abort, State2} ->
+	    process_sasl_failure(aborted, <<"">>, State2)
+    end.
+
+process_sasl2_task_data(#sasl2_task_data{sub_els = Els},
+			#{sasl2_inline_els := InlineEls, user := User} = State) ->
+    Res = try callback(handle_sasl2_task_data, Els, InlineEls, State)
+	  catch _:{?MODULE, undef} -> []
+	  end,
+    case Res of
+	{task_data, Els2, State2} ->
+	    send_pkt(State2, #sasl2_task_data{sub_els = Els2});
+	{success, Els2, Results, State2} ->
+	    process_sasl2_post_success(Els2, Results, User, undefined, State2);
+	{abort, State2} ->
+	    process_sasl_failure(aborted, <<"">>, State2)
+    end.
+
+-spec process_sasl2_post_success([xmpp_element()], [xmpp_element()], binary(), binary() | undefined, state()) -> state().
+process_sasl2_post_success(NewEls, Results, User, ServerOut,
+			   #{server := Server,
+			     sasl2_inline_els := InlineEls} = State) ->
+    {State2, BindResults} = process_bind2(State, NewEls),
+    Results2 = Results ++ BindResults,
+
+    NewJid = jid:make(User, Server, maps:get(resource, State2, <<>>)),
+    State3 = send_pkt(State2, #sasl2_success{additional_data = ServerOut,
+					     sub_els = Results2,
+					     jid = NewJid}),
+    case is_disconnected(State3) of
+	true -> State3;
+	_ ->
+	    State4 = try callback(handle_sasl2_inline_post, InlineEls,
+				  Results2, State3)
+		     catch _:{?MODULE, undef} -> State3
+		     end,
+	    State5 = process_bind2_post(State4, NewEls, Results2),
+	    case is_disconnected(State5) of
+		true -> State5;
+		false ->
+		    map_remove_keys(State5, [sasl2_stream_from, sasl2_inline_els,
+					     sasl2_ua_id, sasl_state, sasl_mech,
+					     sasl_channel_bindings, sasl2_extra_auth_info])
 	    end
     end.
 
@@ -1168,8 +1230,9 @@ process_bind2(#{sasl2_ua_id := UAId, user := User, server := Server} = State, El
 	#bind2_bind{tag = Tag, sub_els = SubEls} ->
 	    {Resource, SessionId} =
 	    case {Tag, UAId} of
-		{undefined, undefined} -> {<<>>, undefined};
-		{<<>>, undefined} -> {<<>>, undefined};
+		{undefined, _} -> {<<>>, undefined};
+		{_, undefined} -> {<<>>, undefined};
+		{<<>>, _} -> {<<>>, undefined};
 		_ ->
 		    Hash = crypto:hash(sha, <<"salt", User/binary, Server/binary, UAId/binary>>),
 		    B64Hash = base64:encode(Hash),
@@ -1186,7 +1249,7 @@ process_bind2(#{sasl2_ua_id := UAId, user := User, server := Server} = State, El
 		{ok, State1} ->
 		    {State2, _, ResultEls} =
 		    try callback(handle_bind2_inline, SubEls, State1)
-		    catch _:{?MODULE, undef} -> {State1, []}
+		    catch _:{?MODULE, undef} -> {State1, SubEls, []}
 		    end,
 		    {State2, [#bind2_bound{sub_els = ResultEls}]};
 		_ ->
@@ -1261,26 +1324,36 @@ send_features(#{stream_version := {1,0},
     TLSAvailable = is_starttls_available(State),
     TLSRequired = is_starttls_required(State),
     Sasl2 = maps:is_key(sasl2_stream_from, State),
+    AllowUnencryptedSasl2 = allow_unencrypted_sasl2(State),
     if
 	(not Encrypted) andalso TLSRequired ->
 	    send_pkt(State, #stream_features{sub_els = get_tls_feature(State)});
 	true ->
-	    {Features, State2} =
-	    case {Encrypted, Sasl2, TLSAvailable} of
-		{true, true, _} -> {get_sasl2_feature(State), init_channel_bindings(State)};
-		{false, true, false} -> {[], disable_sasl2(State)};
-		{false, _, true} -> {get_tls_feature(State), State};
-		{true, _, _} -> {[], init_channel_bindings(State)};
-		_ -> {[], State}
+	    State2 = case AllowUnencryptedSasl2 orelse Encrypted of
+			 true -> init_channel_bindings(State);
+			 _ -> State
+		     end,
+	    {Features, State3} =
+	    case {Encrypted, Sasl2, AllowUnencryptedSasl2, TLSAvailable} of
+		{false, true, true, true} ->
+		    {get_tls_feature(State2) ++ get_sasl2_feature(State2), State2};
+		{_, true, _, _} when Encrypted; AllowUnencryptedSasl2 ->
+		    {get_sasl2_feature(State2), State2};
+		{false, true, false, false} ->
+		    {[], disable_sasl2(State2)};
+		{false, _, _, true} ->
+		    {get_tls_feature(State2), State2};
+		_ ->
+		    {[], State2}
 	    end,
 	    Features2 =
-		get_sasl_feature(State2) ++
+		get_sasl_feature(State3) ++
 		Features ++
-		get_compress_feature(State2) ++
-		get_bind_feature(State2) ++
-		get_session_feature(State2) ++
-		get_other_features(State2),
-	    send_pkt(State2, #stream_features{sub_els = Features2})
+		get_compress_feature(State3) ++
+		get_bind_feature(State3) ++
+		get_session_feature(State3) ++
+		get_other_features(State3),
+	    send_pkt(State3, #stream_features{sub_els = Features2})
     end;
 send_features(State) ->
     %% clients and servers from stone age
@@ -1310,6 +1383,12 @@ check_password_digest_fun(Mech, State) ->
     catch _:{?MODULE, undef} -> fun(_, _, _, _, _) -> {false, undefined} end
     end.
 
+-spec get_fast_tokens_fun(xmpp_sasl:mechanism(), state()) -> fun().
+get_fast_tokens_fun(Mech, State) ->
+    try callback(get_fast_tokens_fun, Mech, State)
+    catch _:{?MODULE, undef} -> fun(_, _) -> [] end
+    end.
+
 -spec get_sasl_mechanisms(state()) -> [xmpp_sasl:mechanism()].
 get_sasl_mechanisms(#{stream_encrypted := Encrypted,
 		      xmlns := NS} = State) ->
@@ -1333,6 +1412,7 @@ get_sasl_feature(#{stream_authenticated := false,
 	    [#sasl_mechanisms{list = Mechs}] ++
 	    case maps:get(sasl_channel_bindings, State, none) of
 		none -> [];
+		not_available -> [];
 		Bindings -> [#sasl_channel_binding{bindings = maps:keys(Bindings)}]
 	    end;
 	true ->
@@ -1342,18 +1422,17 @@ get_sasl_feature(_) ->
     [].
 
 -spec get_sasl2_feature(state()) -> [sasl2_authenticaton() | sasl_channel_binding()].
-get_sasl2_feature(#{stream_authenticated := false,
-		    stream_encrypted := Encrypted} = State) when Encrypted ->
+get_sasl2_feature(#{stream_authenticated := false} = State) ->
     Mechs = get_sasl_mechanisms(State),
 
-    {SASL2Features, Bind2Features} =
+    {SASL2Features, Bind2Features, ExtraFeatures} =
     try callback(inline_stream_features, State)
     catch _:{?MODULE, undef} ->
-	{[], []}
+	{[], [], []}
     end,
 
     BindFeature = #bind2_bind{inline = Bind2Features},
-    [#sasl2_authenticaton{mechanisms = Mechs, inline = [BindFeature | SASL2Features]}];
+    [#sasl2_authenticaton{mechanisms = Mechs, inline = [BindFeature | SASL2Features], sub_els = ExtraFeatures}];
 get_sasl2_feature(_) ->
     [].
 
@@ -1417,6 +1496,12 @@ is_starttls_available(State) ->
 -spec is_starttls_required(state()) -> boolean().
 is_starttls_required(State) ->
     try callback(tls_required, State)
+    catch _:{?MODULE, undef} -> false
+    end.
+
+-spec allow_unencrypted_sasl2(state()) -> boolean().
+allow_unencrypted_sasl2(State) ->
+    try callback(allow_unencrypted_sasl2, State)
     catch _:{?MODULE, undef} -> false
     end.
 
